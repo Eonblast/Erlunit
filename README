@@ -1,0 +1,19 @@
+Erlunit 0.1
+
+Simple Test Suite tool for Erlang
+---------------------------------
+
+"I do use a form of micro testing that is built into Erlang." - Joe Armstrong
+
+Joe Armstrong describes how you don't really need a test frame work in many 
+situations, because the pattern matching in Erlang can be used for testing. 
+http://armstrongonsoftware.blogspot.com/2009/01/micro-lightweight-unit-testing.html
+
+But if you'd still like to use something more, yet simple, this may be a start.
+
+Note that this is not the 'Erlunit' that some web pages mentioned prior to 2010.
+
+License
+-------
+GPL 3 - http://www.gnu.org/licenses/gpl-3.0.html
+
