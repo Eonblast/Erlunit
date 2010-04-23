@@ -88,12 +88,12 @@
 
 -define(VERSION, "0.1").
 -define(LIBRARY, "Erlunit").
--define(COPYRIGHT, "(c) 2010 Eonblast Corporation - Open Source MIT License").
+-define(COPYRIGHT, "(c) 2010 Eonblast Corporation http://www.eonblast.com").
 
 -define(PROMPT, "erlunit: ").
 -define(INDENT, "         ").
 
--define(USE, "This is an error in the way you use erlunit, or an error in erlunit itself.").
+-define(USERR, "This is an error in the way you use erlunit, or an error in erlunit itself.").
 
 -define(DEFAULT_SUITE_NAME, "Default Suite").
 
@@ -482,7 +482,7 @@ execute_loop(Phase, SuitesActive, SuitesToPrint) ->
 
 				% protection vs misuse
 				true ->
-					exit("Too late to add ~s. " ++ ?USE ++ " Try D3.", [Name])
+					exit("Too late to add ~s. " ++ ?USERR ++ " Try D3.", [Name])
 			end;
 
 		{ done, Suite } -> 
@@ -537,7 +537,7 @@ execute_loop(Phase, SuitesActive, SuitesToPrint) ->
 		end
 
 		after 3000 ->
-			exit("Main process stalled. " ++ ?USE ++ " Try 3D.")
+			exit("Main process stalled. " ++ ?USERR ++ " Try 3D.")
 	end.
 
 
@@ -649,12 +649,12 @@ suite_loop(Nom, Caller, Sub, Passed, Failed, Crashed) ->
 			suite_loop(Nom, Caller, Sub, Passed, Failed, Crashed);
 			
 		Malformed -> 
-			echo("##### ~s can't deal with ~p. ~s #####", [Nom, Malformed, ?USE]),
+			echo("##### ~s can't deal with ~p. ~s #####", [Nom, Malformed, ?USERR]),
 			self() ! crashed,
 			suite_loop(Nom, Caller, Sub, Passed, Failed, Crashed)
 			
 		after 1000 ->
-			exit("Suite stalled. " ++ ?USE)
+			exit("Suite stalled. " ++ ?USERR)
     end.
 
 %%%****************************************************************************
@@ -755,7 +755,7 @@ glist_add(GList, Key, Contents) ->
 	vecho(?D4, "glist_add: GList ~p | Key ~p | Contents ~p", [GList, Key, Contents]),
 
 	GList ! { add, { Key, Contents }, self() },
-	receive ok -> ok after 3000 -> exit("Urgh. Programmed to death. glist_add() stalled. " ++ ?USE ++ " Try D4.") end.
+	receive ok -> ok after 3000 -> exit("Urgh. Programmed to death. glist_add() stalled. " ++ ?USERR ++ " Try D4.") end.
 	% this is forced sequentiality
 
 %%%
@@ -767,7 +767,7 @@ glist_add(GList, Key, Contents) ->
 glist_drop(GList, Key) ->
 	
 	GList ! { drop, Key, self() },
-	receive ok -> ok after 3000 -> exit("Urgh. Programmed to death. glist_drop() stalled. " ++ ?USE ++ " Try D4.") end.
+	receive ok -> ok after 3000 -> exit("Urgh. Programmed to death. glist_drop() stalled. " ++ ?USERR ++ " Try D4.") end.
 	% this is forced sequentiality
 
 %%%
@@ -807,7 +807,7 @@ glist_get(GList, Key, Default, Retry) ->
 						_ ->
 							Default 
 					end
-				after 3000 -> exit("Urgh. Programmed to death. glist_get() stalled. " ++ ?USE ++ " Try D4.") 
+				after 3000 -> exit("Urgh. Programmed to death. glist_get() stalled. " ++ ?USERR ++ " Try D4.") 
 			end;
 			% immediate receive forces sequentiality
 		
@@ -936,7 +936,7 @@ banner(Message) ->
     io:format("---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--~n"),
     io:format("---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--~n"),
     io:format("------------------------------------------------------------------------o--~n"),
-    io:format("~s ~s   ~s ~s~n",[?LIBRARY, ?VERSION, ?COPYRIGHT, Message]),
+    io:format("~s ~s       ~s ~s~n",[?LIBRARY, ?VERSION, ?COPYRIGHT, Message]),
     io:format("------------------------------------------------------------------------o--~n"),
     ok.
     

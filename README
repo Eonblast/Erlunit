@@ -57,7 +57,7 @@ That's it. Read more in sample.erl.
 Using Suites:
 
 	erlunit:start(),                              % initializes & prints heads
-	erlunit:suite("Suite 1"),					  % initialize a suite
+	erlunit:suite("Suite 1"),                     % initialize a suite
 	erlunit:true(1 == 1,"1 and 1 are equal"),     % mounts tests 
 	...
 	erlunit:execute().                            % executes & prints results
@@ -68,7 +68,7 @@ Suites are used for organizing tests that belong together. More in sample.erl.
 License
 -------
 
-Copyright (c) 2010 Eonblast Corporation
+Copyright (c) 2010 Eonblast Corporation http://www.eonblast.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -77,8 +77,8 @@ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+The above copyright notice, including link, and this permission notice shall 
+be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

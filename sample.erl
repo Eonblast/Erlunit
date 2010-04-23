@@ -70,7 +70,7 @@ sample1() ->
 	banner("Super simple demonstration #1 - imperative style."),
 	
 	erlunit:start(),
-	erlunit:equal(1, 2),
+	erlunit:equal(1, 1),
 	erlunit:execute().
 
 
