@@ -1,13 +1,13 @@
 %%%----------------------------------------------------------------------------
 %%% File        : sample.erl
 %%% Description : Sample usage of test functions in erlunit.erl
-%%% Version     : 0.2
+%%% Version     : 0.2.1/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - http://www.opensource.org/licenses/mit-license.php 
 %%% Author      : H. Diedrich <hd2010@eonblast.com>
 %%% Created     : 18 Apr 2010
-%%% Changed     : 22 Apr 2010 - see CHANGES
+%%% Changed     : 23 Apr 2010 - see CHANGES
 %%% Tested on   : Erlang R13B01
 %%%----------------------------------------------------------------------------
 %%%
@@ -16,7 +16,6 @@
 %%% It can be read top down. There are explanation sections mixed in.
 %%% 
 %%% You should read the two pages covering samples 1, 2, 3 to get started. 
-%%% 
 %%%
 %%%----------------------------------------------------------------------------
 %%%
@@ -26,15 +25,15 @@
 %%%
 %%% Usage is: 'reading this source'. 
 %%%
-%%% Try, then alter and re-try the samples 1, 2, 3, 4, 5, 10:
+%%% Try this to find out if it all compiles well on your machine:
+%%%  
+%%% # erl
+%%% 1> {ok,_} = c(erlunit), {ok,_} = c(sample), sample:run().
+%%%  
+%%% Then try individual samples samples (1, 2, 3, 4, 5, 10):
 %%%
 %%% # erl
 %%% 1> c(erlunit), c(sample), sample:sample1().
-%%%  
-%%% Run all samples at once:
-%%%
-%%% # erl
-%%% 1> c(erlunit), c(sample), sample:run().
 %%%
 %%%----------------------------------------------------------------------------
 %%%
@@ -49,7 +48,7 @@
 
 -module(sample).
 
--vsn(0.2).
+-vsn("0.2.1/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -58,14 +57,12 @@
 
 -export([run/0, sample1/0, sample2/0, sample3/0, sample4/0, sample5/0]).
 -export([sample10/0]).
--export([banner/1, banner2/1]).
 
 -import(erlunit).
 
--compile({nowarn_unused_function, [center/2]}).
+-compile({nowarn_unused_function, [banner/1]}).
 
-
--define(VERSION, "0.2").
+-define(VERSION, "0.2.1/alpha").
 -define(PROGRAM, "Test Samples").
 
 %%%****************************************************************************
@@ -74,7 +71,7 @@
 
 sample1() ->
 
-	banner("Super simple demonstration #1 - imperative style."),
+	erlunit:strong_banner("Super simple demonstration #1 - imperative style."),
 	
 	erlunit:start(),
 	erlunit:equal(1, 1),
@@ -124,7 +121,7 @@ sample1() ->
 
 sample2() ->
 
-	banner("Super simple demonstration #2 - message passing style."),
+	erlunit:strong_banner("Super simple demonstration #2 - message passing style."),
 	
 	Test = erlunit:start(),
 	Test ! { equal, 1, 1 },
@@ -151,7 +148,7 @@ sample2() ->
 
 sample3() ->
 
-	banner("Super simple demonstration #3 - suites."),
+	erlunit:strong_banner("Super simple demonstration #3 - suites."),
 	
 	erlunit:start(),
 
@@ -174,7 +171,7 @@ sample3() ->
 %%%****************************************************************************
 sample4() ->
 
-	banner("Super simple demonstration #4 - concurrent suites."),
+	erlunit:strong_banner("Super simple demonstration #4 - concurrent suites."),
 	
 	erlunit:start(),
 
@@ -204,11 +201,18 @@ sample4() ->
 %%% Suites can be run concurrently. Running this sample will show how the
 %%% individual checks of both suits are neatly interleaving.
 %%%
+%%% This only works with the message passing notation. It exploits the effect
+%%% that the suites are 'loaded' with checks pretty fast and the actual
+%%% execution of the checks doesn't start before erlunit:execute() is called.
+%%%
+%%% Which in effect mostly means: wait for the suites to get done. And so it
+%%% waits and gives the suites the chance to use the cpu time between them.
+%%%
 %%%----------------------------------------------------------------------------
 
 sample5() ->
 
-	banner("Simple demonstration of test functions: parallel with suites."),
+	erlunit:strong_banner("Simple demonstration of test functions: parallel with suites."),
 	erlunit:echo("Suites will run concurrently and their output will *interleave*!"),
 	
 	erlunit:start(),
@@ -256,7 +260,7 @@ sample5() ->
 
 sample10() ->
 
-	banner("Demonstrating the use of suite functions."),
+	erlunit:strong_banner("Demonstrating the use of suite functions."),
 	
 	erlunit:start(),
 	
@@ -333,7 +337,7 @@ suite2() ->
 
 run() ->
 
-	banner("ALL SAMPLES"),
+	erlunit:strong_banner("ALL SAMPLES"),
 	
 	sample1(),
 	sample2(),
@@ -355,40 +359,19 @@ run() ->
 
 zero() -> 0.
 
+
 %%%****************************************************************************
 %%% SCREEN UTILITY
 %%%****************************************************************************
 %%%
-
--define(WIDTH, 75).
--define(DASHLINE, string:chars($*, ?WIDTH)).
-
 %%%----------------------------------------------------------------------------
-%%% Banner
+%%% Light Banner
 %%%----------------------------------------------------------------------------
-
-%%% Centered banner with text only:
-
-banner(Text) ->
-
-    io:format("~n~s~n~s~s~n~s~n",[?DASHLINE, center_indent(Text, ?WIDTH), Text,?DASHLINE]).
-
 %%% Left-aligned banner with program name, version and message text:
 
-banner2(Message) ->
-    io:format("~s~n~s ~s~n~s~n~s~n",[?DASHLINE, ?PROGRAM, ?VERSION, Message,?DASHLINE]).
+banner(Message) ->
+    io:format("~s~n~s ~s~n~s~n~s~n",[erlunit:dashline(), ?PROGRAM, ?VERSION, Message, erlunit:dashline()]).
 
-%%%----------------------------------------------------------------------------
-%%% Centering a headline
-%%%----------------------------------------------------------------------------
-
-center(Text, Width) ->
-
-	center_indent(Text, Width) ++ Text.
-
-center_indent(Text, Width) ->
-	string:chars(32, erlang:max(0, trunc((Width - length(Text)) / 2))).
-	
 
 %%%----------------------------------------------------------------------------
 %%% Further reading

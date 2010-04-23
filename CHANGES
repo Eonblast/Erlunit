@@ -1,15 +1,24 @@
-Erlunit 0.2 - CHANGES
+Erlunit 0.2.1/alpha - CHANGES
 
-0.2     23 Apr 2010 - Crash count, Fun payload
+0.2.1   23 Apr 2010 - More Checks, more tests
 
-	    - Added test.erl, this actually tests the erlunit.erl functions
+        +  additional checks: true, not_true, false, not_false, bigger, lesser,
+           pass, fail, throws, exits, error.
+        +  Inverted Suites, for simple testing of failing checks
+        +  much expanded test.erl to test erlunit.erl
+        +  added SAMPLES dump
+        +  minor fixes
 
-        - officially deals with crashes now (survives and count. Actually worked before.)
 
-        - automatically execute fun() payload
-    
-        - cleaned samples up
+0.2     23 Apr 2010 - Crash Count, Fun() Values - c5e53a44120d78611f161a2d2ca4aa9af373dba8
 
-0.1.2   22 Apr 2010 - fixes - 3e89ba4db3d26839adaec5e72a3e4e948b95c9de
+	    +  Added test.erl, this actually tests the erlunit.erl functions
+        +  officially deals with crashes now (survives and count. Actually worked before.)
+        +  automatically execute fun() payload
+        +  cleaned samples up
 
-0.1     22 Apr 2010 - First Public Release to github - f1e46c2442341a89ecf153ac46ef9932a46c1583
+
+0.1.2   22 Apr 2010 - Fixes and Cosmetics - 3e89ba4db3d26839adaec5e72a3e4e948b95c9de
+
+
+0.1     22 Apr 2010 - First Public Release to Github - f1e46c2442341a89ecf153ac46ef9932a46c1583

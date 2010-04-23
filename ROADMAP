@@ -1,20 +1,20 @@
-Erlunit 0.2 - ROADMAP
+Erlunit 0.2.1/alpha - ROADMAP
 
 
 Mail hd2010@eonblast.com with requests. No promisses:
 
 
-0.3 - make checks beyond equal and not_equal operational:
-      true, not_true, false, not_false, bigger, lesser,
-      pass, fail, throws, exits, error.
-
-    - docs for existing checks
+0.3 - docs for existing checks
    
     - unregister stats counter process correctly
+    
+    - terminal colors
     
 0.4 - adding checks & do more applied testing
 
     - suppress the default suite's dump
+    
+    - suite count
 
 0.5 - make sense of suite concurrency
 
@@ -23,6 +23,8 @@ Mail hd2010@eonblast.com with requests. No promisses:
     - internal: possibly refactor suite_lop, remove counter
     
     - make verbosity and debug flags consistent
+    
+    - check-names consistency
 
 0.7 - more doc
 

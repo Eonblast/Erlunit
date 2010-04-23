@@ -1,0 +1,181 @@
+Erlunit 0.2.1/alpha - SAMPLES
+
+Read about samples in sample.erl. It is writting to be read top down.
+
+Below, you find the results you should get from: 
+
+		#  erl
+		1> c(erlunit).
+		2> c(sample).
+		3> sample:run().
+
+
+***************************************************************************
+                                ALL SAMPLES
+***************************************************************************
+
+***************************************************************************
+             Super simple demonstration #1 - imperative style.
+***************************************************************************
+------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
+---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
+------------------------------------------------------------------------o--
+Erlunit 0.2.1/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+------------------------------------------------------------------------o--
+erlunit: Start of Tests.
+erlunit: + ok | Equality check | 1 == 1 as it should.
+erlunit: ------------------------------------------------------------------
+erlunit: + OK | Default Suite: all 1 tests passed.
+erlunit: ------------------------------------------------------------------
+erlunit: ==================================================================
+erlunit: Overall passed - Tests: 1, Passed: 1, Failed: 0, Crashes: 0
+erlunit: ==================================================================
+--o---------------------------------------------------------------------o--
+
+***************************************************************************
+          Super simple demonstration #2 - message passing style.
+***************************************************************************
+------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
+---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
+------------------------------------------------------------------------o--
+Erlunit 0.2.1/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+------------------------------------------------------------------------o--
+erlunit: Start of Tests.
+erlunit: + ok | Equality check | 1 == 1 as it should.
+erlunit: ==================================================================
+erlunit: Overall passed - Tests: 1, Passed: 1, Failed: 0, Crashes: 0
+erlunit: ==================================================================
+--o---------------------------------------------------------------------o--
+
+***************************************************************************
+                  Super simple demonstration #3 - suites.
+***************************************************************************
+------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
+---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
+------------------------------------------------------------------------o--
+Erlunit 0.2.1/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+------------------------------------------------------------------------o--
+erlunit: Start of Tests.
+erlunit: + ok | Suite #1: Equality check | 100 == 100 as it should.
+erlunit: + ok | Suite #2: Non-equality check | a /= b as it should.
+erlunit: ------------------------------------------------------------------
+erlunit: + OK | Suite #1: all 1 tests passed.
+erlunit: ------------------------------------------------------------------
+erlunit: ------------------------------------------------------------------
+erlunit: + OK | Suite #2: all 1 tests passed.
+erlunit: ------------------------------------------------------------------
+erlunit: ==================================================================
+erlunit: Overall passed - Tests: 2, Passed: 2, Failed: 0, Crashes: 0
+erlunit: ==================================================================
+--o---------------------------------------------------------------------o--
+
+***************************************************************************
+            Super simple demonstration #4 - concurrent suites.
+***************************************************************************
+------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
+---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
+------------------------------------------------------------------------o--
+Erlunit 0.2.1/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+------------------------------------------------------------------------o--
+erlunit: Start of Tests.
+erlunit: + ok | Suite #1: Equality check | 100 == 100 as it should.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 2 as it should.
+erlunit: + ok | Suite #3: Non-equality check | "A" /= 3 as it should.
+erlunit: ------------------------------------------------------------------
+erlunit: + OK | Suite #1: all 1 tests passed.
+erlunit: ------------------------------------------------------------------
+erlunit: ------------------------------------------------------------------
+erlunit: + OK | Suite #2: all 1 tests passed.
+erlunit: ------------------------------------------------------------------
+erlunit: ------------------------------------------------------------------
+erlunit: + OK | Suite #3: all 1 tests passed.
+erlunit: ------------------------------------------------------------------
+erlunit: ==================================================================
+erlunit: Overall passed - Tests: 3, Passed: 3, Failed: 0, Crashes: 0
+erlunit: ==================================================================
+--o---------------------------------------------------------------------o--
+
+***************************************************************************
+       Simple demonstration of test functions: parallel with suites.
+***************************************************************************
+erlunit: Suites will run concurrently and their output will *interleave*!
+------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
+---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
+------------------------------------------------------------------------o--
+Erlunit 0.2.1/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+------------------------------------------------------------------------o--
+erlunit: Start of Tests.
+erlunit: + ok | Suite #1: Check for true | evaluates to true.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 2 as it should.
+erlunit: + ok | Suite #1: Equality check | 3 == 3 as it should.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 3 as it should.
+erlunit: + ok | Suite #1: Equality check | 4 == 4 as it should.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 4 as it should.
+erlunit: + ok | Suite #1: Equality check | 5 == 5 as it should.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 5 as it should.
+erlunit: + ok | Suite #1: Equality check | 6 == 6 as it should.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 6 as it should.
+erlunit: + ok | Suite #1: Equality check | 7 == 7 as it should.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 7 as it should.
+erlunit: + ok | Suite #1: Equality check | 8 == 8 as it should.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 8 as it should.
+erlunit: + ok | Suite #1: Equality check | 9 == 9 as it should.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 9 as it should.
+erlunit: + ok | Suite #1: Equality check | 10 == 10 as it should.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 10 as it should.
+erlunit: ------------------------------------------------------------------
+erlunit: + OK | Suite #1: all 9 tests passed.
+erlunit: ------------------------------------------------------------------
+erlunit: ------------------------------------------------------------------
+erlunit: + OK | Suite #2: all 9 tests passed.
+erlunit: ------------------------------------------------------------------
+erlunit: ==================================================================
+erlunit: Overall passed - Tests: 18, Passed: 18, Failed: 0, Crashes: 0
+erlunit: ==================================================================
+--o---------------------------------------------------------------------o--
+
+***************************************************************************
+                 Demonstrating the use of suite functions.
+***************************************************************************
+------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
+---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
+------------------------------------------------------------------------o--
+Erlunit 0.2.1/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+------------------------------------------------------------------------o--
+erlunit: Start of Tests.
+erlunit: + ok | Suite #1/Simple: Check for true | evaluates to true.
+erlunit: + ok | Suite #1/Simple: Equality check | 1 == 1 as it should.
+erlunit: + ok | Suite #1/Simple: Check for exception | runs into error, so fails as it should.
+erlunit: Suite #2 gives names to individual checks
+erlunit: + ok | Suite #2/Simple (verbose): One Equals One | evaluates to true.
+erlunit: + ok | Suite #2/Simple (verbose): One Equals Zero | evaluates to false.
+erlunit: + ok | Suite #2/Simple (verbose): One Does Not Equal Two | evaluates to false, not true, as it should.
+erlunit: + ok | Suite #2/Simple (verbose): Foo Is Not True | evaluates to foo, not false, as it should.
+erlunit: + ok | Suite #2/Simple (verbose): One Not Not Equals One | evaluates to true, not false, as it should.
+erlunit: + ok | Suite #2/Simple (verbose): Bar Is Not False | evaluates to bar, not false, as it should.
+erlunit: + ok | Suite #2/Simple (verbose): Once More Equality | 1 == 1 as it should.
+erlunit: + ok | Suite #2/Simple (verbose): And Non-Equality | 1 /= 0 as it should.
+erlunit: + ok | Suite #2/Simple (verbose): Trivial Fun | passes ok.
+erlunit: + ok | Suite #2/Simple (verbose): Div By Zero | runs into error, so fails as it should.
+erlunit: ------------------------------------------------------------------
+erlunit: + OK | Suite #1/Simple: all 3 tests passed.
+erlunit: ------------------------------------------------------------------
+erlunit: ------------------------------------------------------------------
+erlunit: + OK | Suite #2/Simple (verbose): all 10 tests passed.
+erlunit: ------------------------------------------------------------------
+erlunit: ==================================================================
+erlunit: Overall passed - Tests: 13, Passed: 13, Failed: 0, Crashes: 0
+erlunit: ==================================================================
+--o---------------------------------------------------------------------o--
