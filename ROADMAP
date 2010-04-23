@@ -1,0 +1,33 @@
+Erlunit 0.1 - ROADMAP
+
+Mail hd2010@eonblast.com with requests. No promisses:
+
+0.2 - clean samples up
+
+    - deal with crashes (survive and count)
+
+    - automatically execute fun() payload
+
+0.3 - make checks beyond equal and not_equal operational:
+      true, not_true, false, not_false, bigger, lesser,
+      pass, fail, throws, exits, error.
+
+    - docs for existing checks
+   
+    - unregister stats counter process correctly
+    
+0.4 - adding checks & do more applied testing
+
+    - suppress the default suite's dump
+
+0.5 - make sense of suite concurrency
+
+0.6 - asynchronous server tests
+
+    - internal: possibly refactor suite_lop, remove counter
+    
+    - make verbosity and debug flags consistent
+
+0.7 - more doc
+
+0.8 - mount and unmount suite/check environment
