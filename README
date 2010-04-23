@@ -6,10 +6,10 @@ Erlunit 0.1 - README
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-------------------------------------------o--
 ------------------------------------------------------------------------o--
 
- Files       : erlunit.erl, sample.erl, test.erl
+ Files       : erlunit.erl, sample.erl
  Description : Simple test functions for Erlang code
  Version     : 0.1
- Status      : beta
+ Status      : alpha
  Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
  License     : MIT - see below 
  Author      : H. Diedrich <hd2010@eonblast.com>
@@ -20,6 +20,7 @@ Erlunit 0.1 - README
 ---------------------------------------------------------------------------
 
 For samples, see sample.erl. It's written to be read top down.
+Click to view: http://github.com/hdiedrich/erlunit/blob/master/sample.erl
 
 For a quick check, run 1> c(erlunit), c(sample), sample:sample1(). 
 

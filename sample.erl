@@ -389,3 +389,10 @@ center(Text, Width) ->
 center_indent(Text, Width) ->
 	string:chars(32, erlang:max(0, trunc((Width - length(Text)) / 2))).
 	
+
+%%%----------------------------------------------------------------------------
+%%% Further reading
+%%%----------------------------------------------------------------------------
+	
+%%% The actual test functions are in erlunit.erl
+%%% Click to view http://github.com/hdiedrich/erlunit/blob/master/erlunit.erl
