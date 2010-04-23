@@ -1,8 +1,8 @@
 %%%----------------------------------------------------------------------------
 %%% File        : erlunit.erl
 %%% Description : Test functions
-%%% Version     : 0.1
-%%% Status      : beta
+%%% Version     : 0.2
+%%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - see below 
 %%% Author      : H. Diedrich <hd2010@eonblast.com>
@@ -61,7 +61,7 @@
 %%%----------------------------------------------------------------------------
 
 -module(erlunit).
--vsn(0.1).
+-vsn(0.2).
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -86,7 +86,7 @@
 
 %%%----------------------------------------------------------------------------
 
--define(VERSION, "0.1").
+-define(VERSION, "0.2").
 -define(LIBRARY, "Erlunit").
 -define(COPYRIGHT, "(c) 2010 Eonblast Corporation http://www.eonblast.com").
 
@@ -116,20 +116,22 @@
 %%% true - check if an expression returns true
 %%%----------------------------------------------------------------------------
 %%%
-%%% NOT YET OPERATIONAL
-%%%
 %%% For true/0 see (*). That is used for a different purposed.
 
-true(A) -> true(A, "Check for true").
+true(msg) -> "Check for true";
 
-true(A, Message) -> true(suite, A, Message).
+true(A) -> true(A, true(msg)).
+
+true(A, Message) -> true(whereis(suite), A, Message).
 
 true(Suite, A, Message) ->
 
-    if A ->
-			passed(Suite, Message, "evaluates to ~p", [A]);
+	AA = payload(A),
+
+    if AA ->
+			passed(Suite, Message, "evaluates to ~p", [AA]);
        true ->
-			failed(Suite, Message, "evaluates to ~p, should be true but is not", [A])
+			failed(Suite, Message, "evaluates to ~p, should be true but is not", [AA])
        end.
 
 %%%
@@ -325,8 +327,11 @@ equal(A, B, Message) -> equal(whereis(suite), A, B, Message).
 
 equal(Suite, A, B, Message) ->
 
+	AA = payload(A),
+	BB = payload(B),
+
     if 
-         A == B ->
+         AA == BB ->
 			passed(Suite, Message, "~p == ~p as it should", [A, B]);
          true ->
          	failed(Suite, Message, "~p /= ~p but should be equal", [A, B])
@@ -597,6 +602,17 @@ suite_loop(Nom, Caller, Sub, Passed, Failed, Crashed) ->
 
 		%% checks
 		%% -----------------------------------------------------------
+
+		{ true, A } ->
+			true(self(), A, true(msg)),
+			suite_loop(Nom, Caller, Sub, Passed, Failed, Crashed);
+
+		{ true, A, Message } ->
+			true(self(), A, Message ),
+			suite_loop(Nom, Caller, Sub, Passed, Failed, Crashed);
+
+		%% -----------------------------------------------------------
+
 		{ equal, A, B } ->
 			equal(self(), A, B, equal(msg)),
 			suite_loop(Nom, Caller, Sub, Passed, Failed, Crashed);
@@ -604,6 +620,8 @@ suite_loop(Nom, Caller, Sub, Passed, Failed, Crashed) ->
 		{ equal, A, B, Message } ->
 			equal(self(), A, B, Message),
 			suite_loop(Nom, Caller, Sub, Passed, Failed, Crashed);
+
+		%% -----------------------------------------------------------
 
 		{ not_equal, A, B } ->
 			not_equal(self(), A, B, not_equal(msg)),
@@ -649,7 +667,7 @@ suite_loop(Nom, Caller, Sub, Passed, Failed, Crashed) ->
 			suite_loop(Nom, Caller, Sub, Passed, Failed, Crashed);
 			
 		Malformed -> 
-			echo("##### ~s can't deal with ~p. ~s #####", [Nom, Malformed, ?USERR]),
+			echo("###### ~s can't deal with ~p. ######~n###### ~s ######", [Nom, Malformed, ?USERR]),
 			self() ! crashed,
 			suite_loop(Nom, Caller, Sub, Passed, Failed, Crashed)
 			
@@ -693,7 +711,7 @@ stats_loop(Nom, Passed, Failed, Crashed) ->
 				Failed > 0 -> 
 					{ Verdict, Line } = { "failed", line(bad) };
 				true -> 
-					{ Verdict, Line } = { "passed", line(good) }
+					{ Verdict, Line } = { "passed", line(splendid) }
 			end,
 
 			echo("~s~n~s ~s - Tests: ~p, Passed: ~p, Failed: ~p, Crashes: ~p~n~s",
@@ -822,9 +840,16 @@ glist_get(GList, Key, Default, Retry) ->
 %%% Be especially wary not to take a cue from these.
 %%%
 %%%----------------------------------------------------------------------------
-%%% safe_unregister - unregister w/o complaint if missing
+%%% payload - execute if function, else return identically.
 %%%----------------------------------------------------------------------------
 
+payload(A) when is_function(A) -> A();
+payload(A) -> A.
+
+%%%
+%%%----------------------------------------------------------------------------
+%%% safe_unregister - unregister w/o complaint if missing
+%%%----------------------------------------------------------------------------
 
 safe_unregister(Name) ->
 
@@ -839,7 +864,7 @@ safe_unregister(Name) ->
 %%%
 %%% Returns 2nd parameter if 1st is true, not "" and not 0. Else 3rd.
 
-iff(Cond, A, _) when is_list(Cond) and Cond /= "" -> A;
+iff(Cond, A, _) when is_list(Cond) and not (Cond == "") -> A;
 
 iff(Cond, A, _) when Cond == true -> A;
 
@@ -905,14 +930,16 @@ line(Type) ->
 	if PrintLines ->
 	
 		if
+			Type == splendid ->
+				"==================================================================";
 			Type == good ->
-				"-----------------------------------------------------------------";
+				"------------------------------------------------------------------";
 			Type == bad ->
-				"#################################################################";
+				"##################################################################";
 			Type == strong ->
-				"*****************************************************************";
+				"******************************************************************";
 		    true ->
-				"................................................................."
+				"..................................................................."
 		end;
 	
 		true -> ""
@@ -936,7 +963,7 @@ banner(Message) ->
     io:format("---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--~n"),
     io:format("---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--~n"),
     io:format("------------------------------------------------------------------------o--~n"),
-    io:format("~s ~s       ~s ~s~n",[?LIBRARY, ?VERSION, ?COPYRIGHT, Message]),
+    io:format("~s ~s          ~s~n~s~s",[?LIBRARY, ?VERSION, ?COPYRIGHT, Message, iff(Message,"~n","")]),
     io:format("------------------------------------------------------------------------o--~n"),
     ok.
     

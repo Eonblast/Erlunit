@@ -1,8 +1,8 @@
 %%%----------------------------------------------------------------------------
 %%% File        : sample.erl
 %%% Description : Sample usage of test functions in erlunit.erl
-%%% Version     : 0.1
-%%% Status      : beta
+%%% Version     : 0.2
+%%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - http://www.opensource.org/licenses/mit-license.php 
 %%% Author      : H. Diedrich <hd2010@eonblast.com>
@@ -26,7 +26,7 @@
 %%%
 %%% Usage is: 'reading this source'. 
 %%%
-%%% Try, then alter and re-try the samples 1, 2, 3, 4, 5, 6, 10:
+%%% Try, then alter and re-try the samples 1, 2, 3, 4, 5, 10:
 %%%
 %%% # erl
 %%% 1> c(erlunit), c(sample), sample:sample1().
@@ -49,8 +49,15 @@
 
 -module(sample).
 
+-vsn(0.2).
+-author("H. Diedrich <hd2010@eonblast.com>").
+-license("MIT - http://www.opensource.org/licenses/mit-license.php").
+-copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
+
+%%%----------------------------------------------------------------------------
+
 -export([run/0, sample1/0, sample2/0, sample3/0, sample4/0, sample5/0]).
--export([sample6/0,sample10/0]).
+-export([sample10/0]).
 -export([banner/1, banner2/1]).
 
 -import(erlunit).
@@ -58,7 +65,7 @@
 -compile({nowarn_unused_function, [center/2]}).
 
 
--define(VERSION, "0.1").
+-define(VERSION, "0.2").
 -define(PROGRAM, "Test Samples").
 
 %%%****************************************************************************
@@ -159,11 +166,11 @@ sample3() ->
 
 	% --- That's it. A complete test program. Run with 
 	% --- # erl
-	% --- 1> c(erlunit), c(sample), sample:sample3a().
+	% --- 1> c(erlunit), c(sample), sample:sample3().
 
 
 %%%****************************************************************************
-%%% #4 SUPER SIMPLE SAMPLE: THREE SUITES, SEQUENTIAL
+%%% #4 SUPER SIMPLE SAMPLE: SREE SUITES, SEQUENTIAL
 %%%****************************************************************************
 sample4() ->
 
@@ -177,7 +184,6 @@ sample4() ->
 	erlunit:suite("#2"),
 	erlunit:not_equal(1, 2),
 
-
 	erlunit:suite("#3"),
 	erlunit:not_equal("A", 3),
 
@@ -186,30 +192,30 @@ sample4() ->
 
 	% --- That's it. A complete test program. Run with 
 	% --- # erl
-	% --- 1> c(erlunit), c(sample), sample:sample3b().
+	% --- 1> c(erlunit), c(sample), sample:sample4().
 	
 
 %%%****************************************************************************
-%%% #5 SIMPLE SAMPLE with suites
+%%% #5 SIMPLE SAMPLE - WITH SUITES
 %%%****************************************************************************
 
-%%%----------------------------------------------------------------------------
+%%%-------------------------------------------------------------------------#5-
 %%%
-%%% Suites can be run concurrently and are by 
+%%% Suites can be run concurrently. Running this sample will show how the
+%%% individual checks of both suits are neatly interleaving.
 %%%
 %%%----------------------------------------------------------------------------
 
 sample5() ->
 
-	erlunit:banner(),
 	banner("Simple demonstration of test functions: parallel with suites."),
-	erlunit:echo("Suites to run concurrently and their output will interleave."),
+	erlunit:echo("Suites will run concurrently and their output will *interleave*!"),
 	
 	erlunit:start(),
 
 	Suite1 = erlunit:suite("#1"),
-	Suite1 ! { equal,  1,  1 },
-	Suite1 ! { equal,  2,  2 },
+	Suite1 ! { true,  1 == 1 },
+	% bug, harden: Suite1 ! { true,  2,  2 }, (right would be Suite1 ! { true,  2 ==  2 },
 	Suite1 ! { equal,  3,  3 },
 	Suite1 ! { equal,  4,  4 },
 	Suite1 ! { equal,  5,  5 },
@@ -220,48 +226,33 @@ sample5() ->
 	Suite1 ! { equal, 10, 10 },
 
 	Suite2 = erlunit:suite("#2"),
-	Suite2 ! { not_equal, 1, 2 },
-	Suite2 ! { not_equal, 1, 3 },
-	Suite2 ! { not_equal, 1, 4 },
-
-	erlunit:execute(),
-	timer:sleep(1000).
-
-	% --- That's it. A complete test program. Run with 
-	% --- # erl
-	% --- 1> c(erlunit), c(sample), sample:sample2().
-
-
-%%%****************************************************************************
-%%% #6 SIMPLE SAMPLE with parallel suites
-%%%****************************************************************************
-
-sample6() ->
-
-	banner("Simple demonstration of test functions: with parallel suites."),
-	
-	erlunit:start(),
-
-	Suite1 = erlunit:suite("#1"),
-	Suite1 ! { equal, 1, 1 },
-	Suite1 ! { equal, 2, 2 },
-	Suite1 ! { equal, 3, 3 },
-
-	Suite2 = erlunit:suite("#2"),
-	Suite2 ! { not_equal, 1, 2 },
-	Suite2 ! { not_equal, 1, 3 },
-	Suite2 ! { not_equal, 1, 4 },
+	Suite2 ! { not_equal, 1,  2 },
+	Suite2 ! { not_equal, 1,  3 },
+	Suite2 ! { not_equal, 1,  4 },
+	Suite2 ! { not_equal, 1,  5 },
+	Suite2 ! { not_equal, 1,  6 },
+	Suite2 ! { not_equal, 1,  7 },
+	Suite2 ! { not_equal, 1,  8 },
+	Suite2 ! { not_equal, 1,  9 },
+	Suite2 ! { not_equal, 1, 10 },
 
 	erlunit:execute().
 
+
 	% --- That's it. A complete test program. Run with 
 	% --- # erl
-	% --- 1> c(erlunit), c(sample), sample:sample6().
+	% --- 1> c(erlunit), c(sample), sample:sample5().
 
 
 %%%****************************************************************************
 %%% #10 MORE STRUCTURED SAMPLE - SUITES
 %%%****************************************************************************
+
+%%%------------------------------------------------------------------------#10-
+%%%
+%%% Suites are well suited to be put in functions to structure your code.
+%%%
+%%%----------------------------------------------------------------------------
 
 sample10() ->
 
@@ -274,17 +265,20 @@ sample10() ->
 	
 	erlunit:execute().
 
+	
+%                                     -(o)-                                   %   
+
 %%%****************************************************************************
 %%% SAMPLE SUITES
 %%%****************************************************************************
 %%%
 %%%----------------------------------------------------------------------------
-%%% #1: Very Simple
+%%% #1: Simple Suite
 %%%----------------------------------------------------------------------------
 
 suite1() ->
 
-	erlunit:suite("#1 - Very Simple"),
+	erlunit:suite("#1/Simple"),
 
 	erlunit:true(1 == 1),
 	erlunit:equal(1, 1),
@@ -299,13 +293,18 @@ suite1() ->
 
 suite2() ->
 
-	erlunit:suite("#2 - Very Simple / verbose"),
+	erlunit:suite("#2/Simple (verbose)"),
 	erlunit:echo("Suite #2 gives names to individual checks"),
 
 	erlunit:true(1 == 1, "One Equals One"),
 	erlunit:false(1 == 0, "One Equals Zero"),
 
-	erlunit:equal(1, 1, "Again Equality"),
+	erlunit:not_true(1 == 2, "One Does Not Equal Two"),
+	erlunit:not_false(foo, "Foo Is Not True"),
+	erlunit:not_false(1 == 1, "One Not Not Equals One"),
+	erlunit:not_false(bar, "Bar Is Not False"),
+
+	erlunit:equal(1, 1, "Once More Equality"),
 	erlunit:not_equal(1, 0, "And Non-Equality"),
 
 	erlunit:pass(fun() -> 1 + 0 end, "Trivial Fun"),
@@ -341,9 +340,10 @@ run() ->
 	sample3(),
 	sample4(),
 	sample5(),
-	sample6(),
 	sample10().
 
+
+%                                     -(o)-                                   %   
 
 %%%****************************************************************************
 %%% UTILITY
@@ -371,7 +371,7 @@ zero() -> 0.
 
 banner(Text) ->
 
-    io:format("~s~n~s~s~n~s~n",[?DASHLINE, center_indent(Text, ?WIDTH), Text,?DASHLINE]).
+    io:format("~n~s~n~s~s~n~s~n",[?DASHLINE, center_indent(Text, ?WIDTH), Text,?DASHLINE]).
 
 %%% Left-aligned banner with program name, version and message text:
 
@@ -395,4 +395,4 @@ center_indent(Text, Width) ->
 %%%----------------------------------------------------------------------------
 	
 %%% The actual test functions are in erlunit.erl
-%%% Click to view http://github.com/hdiedrich/erlunit/blob/master/erlunit.erl
+%%% View online at http://github.com/hdiedrich/erlunit/blob/master/erlunit.erl

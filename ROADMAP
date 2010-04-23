@@ -1,12 +1,8 @@
-Erlunit 0.1 - ROADMAP
+Erlunit 0.2 - ROADMAP
+
 
 Mail hd2010@eonblast.com with requests. No promisses:
 
-0.2 - clean samples up
-
-    - deal with crashes (survive and count)
-
-    - automatically execute fun() payload
 
 0.3 - make checks beyond equal and not_equal operational:
       true, not_true, false, not_false, bigger, lesser,

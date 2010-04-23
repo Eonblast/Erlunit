@@ -1,4 +1,4 @@
-Erlunit 0.1 - README
+Erlunit 0.2 - README
 
 ------------------------------------------------------------------------o--
 ---ooo-ooo--o--o--o-o--o-o-ooo------------------------------------------o--
@@ -6,21 +6,23 @@ Erlunit 0.1 - README
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-------------------------------------------o--
 ------------------------------------------------------------------------o--
 
- Files       : erlunit.erl, sample.erl
+ Files       : erlunit.erl, sample.erl, test.erl
  Description : Simple test functions for Erlang code
- Version     : 0.1
+ Version     : 0.2
  Status      : alpha
  Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
  License     : MIT - see below 
  Author      : H. Diedrich <hd2010@eonblast.com>
  Created     : 18 Apr 2010
- Changed     : 22 Apr 2010 - see CHANGES
+ Changed     : 23 Apr 2010 - see CHANGES
  Tested on   : Erlang R13B01
 
 ---------------------------------------------------------------------------
 
+Download from github: http://github.com/hdiedrich/erlunit/tarball/master
+
 For samples, see sample.erl. It's written to be read top down.
-Click to view: http://github.com/hdiedrich/erlunit/blob/master/sample.erl
+View it at: http://github.com/hdiedrich/erlunit/blob/master/sample.erl
 
 For a quick check, run 1> c(erlunit), c(sample), sample:sample1(). 
 

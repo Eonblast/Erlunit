@@ -1,5 +1,15 @@
-Erlunit 0.1 - CHANGES
+Erlunit 0.2 - CHANGES
 
+0.2     23 Apr 2010 - Crash count, Fun payload
 
-0.1 - 22 Apr 2010 - First Public Release to github
-      f1e46c2442341a89ecf153ac46ef9932a46c1583
+	    - Added test.erl, this actually tests the erlunit.erl functions
+
+        - officially deals with crashes now (survives and count. Actually worked before.)
+
+        - automatically execute fun() payload
+    
+        - cleaned samples up
+
+0.1.2   22 Apr 2010 - fixes - 3e89ba4db3d26839adaec5e72a3e4e948b95c9de
+
+0.1     22 Apr 2010 - First Public Release to github - f1e46c2442341a89ecf153ac46ef9932a46c1583
