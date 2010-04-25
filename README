@@ -8,7 +8,7 @@ Erlunit 0.2.2/alpha - README
 
  Files       : erlunit.erl, sample.erl, test.erl
  Description : Simple test functions for Erlang code
- Version     : 0.2.1/alpha
+ Version     : 0.2.2/alpha
  Status      : alpha
  Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
  License     : MIT - see below 
@@ -41,10 +41,11 @@ http://armstrongonsoftware.blogspot.com/2009/01/micro-lightweight-unit-testing.h
 
 But if you'd still like to use something a tad more baroque, yet simple, this 
 package here may be a start. Best, start reading the beginning of sample.erl.
-
-Note that this is not the 'Erlunit' that some web pages mentioned prior to 2010.
+View it at: http://github.com/Eonblast/Erlunit/blob/master/sample.erl
 
 In sample.erl you also find links to EUnit and etap, you may want to look at.
+
+Note that this is not the 'Erlunit' that some web pages mentioned prior to 2010.
 
 
 Samples
@@ -91,5 +92,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
-http://www.opensource.org/licenses/mit-license.php
