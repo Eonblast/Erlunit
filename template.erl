@@ -1,21 +1,21 @@
 %%%----------------------------------------------------------------------------
-%%% File        : sample.erl
-%%% Description : Sample usage of test functions in erlunit.erl
+%%% File        : template.erl
+%%% Description : Template of mininal test functions using erlunit.erl
 %%% Version     : 0.2.2/alpha
 %%% Status      : alpha
-%%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
+%%% Copyright   : Public Domain
 %%% License     : MIT - http://www.opensource.org/licenses/mit-license.php 
 %%% Author      : H. Diedrich <hd2010@eonblast.com>
-%%% Created     : 18 Apr 2010
-%%% Changed     : 23 Apr 2010 - see CHANGES
+%%% Created     : 24 Apr 2010
+%%% Changed     : 24 Apr 2010 - see CHANGES
 %%% Tested on   : Erlang R13B01
 %%%----------------------------------------------------------------------------
 %%%
-%%% This program demonstrates the use of the Erlunit test functions.
+%%% Delete the above and roll your own. Maybe keep a copy of the original file.
 %%%
-%%% It can be read top down. There are explanation sections mixed in.
+%%% This is a very simple sample. Connect it with your own stuff by 
 %%% 
-%%% You should read the two pages covering samples 1, 2, 3 to get started. 
+%%% Then, you could read a bit in sample.erl to get started. 
 %%%
 %%%----------------------------------------------------------------------------
 %%%
@@ -23,72 +23,30 @@
 %%%
 %%%----------------------------------------------------------------------------
 %%%
-%%% Usage is: 'reading this source'. 
+%%% Usage:
 %%%
 %%% Run it though to find out if it all compiles on your machine:
 %%%  
 %%%      #  erl
 %%%      1> {ok,_} = c(erlunit), {ok,_} = c(sample), sample:run().
 %%%  
-%%% To later try individual samples, do (1, 2, 3, 4, 5, 10):
-%%%
-%%%      #  erl
-%%%      1> c(erlunit), c(sample), sample:sample1().
-%%%
 %%%----------------------------------------------------------------------------
 %%%
-%%% : E r l u n i t - is a naive approach at an academically discussed issue. :
-%%% : There are Erlang masters on the erlang-questions list, this here source :
-%%% : ist not written by one. Beware of copying mistakes if you are learning. :
-%%% :                                                                         : 
-%%% : Thus consider these two serious contenders who deserve your attention:  :
-%%% :                                                                         :
-%%% : E U n i t - by Richard Carlsson and Michaêl Rémond.                     :
-%%% : "EUnit is a unit testing framework for Erlang. It is very powerful and  :
-%%% : flexible, is easy to use, and has small syntactical overhead."          :
-%%% : http://svn.process-one.net/contribs/trunk/eunit/doc/overview-summary.html
-%%% :                                                                         :
-%%% : e t a p - by Jeremy Wall, Paul J. Davis, Nick Gerakines et al.          :
-%%% : "etap is a collection of Erlang modules that provide a TAP testing client
-%%% : library. These modules allow developers to create extensive and compre- :
-%%% : hensive tests covering many aspects of application and module development. 
-%%% : This includes simple assertions, exceptions, the application behavior and
-%%% : event web requests." http://github.com/ngerakines/etap/downloads        :
-%%%                                                                          
-%%%----------------------------------------------------------------------------
-%%% :                                                                         :
-%%% : Mail to hd2010@eonblast.com with questions and suggestions, I will be   :
-%%% : happy to answer. - Henning                                              :
+%%% Mail to hd2010@eonblast.com with questions and suggestions, I will be happy
+%%% to answer. - Henning
 %%%
 %%%----------------------------------------------------------------------------
 
--module(sample).
-
--vsn("0.2.2/alpha").
--author("H. Diedrich <hd2010@eonblast.com>").
--license("MIT - http://www.opensource.org/licenses/mit-license.php").
--copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
-
-%%%----------------------------------------------------------------------------
-
--export([run/0, sample1/0, sample2/0, sample3/0, sample4/0, sample5/0]).
--export([sample10/0]).
+-module(template).
 
 -import(erlunit).
 
--compile({nowarn_unused_function, [banner/1]}).
-
--define(VERSION, "0.2.2/alpha").
--define(PROGRAM, "Test Samples").
-
 %%%****************************************************************************
-%%% #1 SUPER SIMPLE SAMPLE - SEQUENTIAL CALL STYLE
+%%% TEMPLATE - SEQUENTIAL CALL STYLE
 %%%****************************************************************************
 
-sample1() ->
+run() ->
 
-	erlunit:strong_banner("Super simple demonstration #1 - imperative style."),
-	
 	erlunit:start(),
 	erlunit:equal(1, 1),
 	erlunit:execute().

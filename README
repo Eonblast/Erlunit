@@ -1,4 +1,4 @@
-Erlunit 0.2 - README
+Erlunit 0.2.1/alpha - README
 
 ------------------------------------------------------------------------o--
 ---ooo-ooo--o--o--o-o--o-o-ooo------------------------------------------o--
@@ -8,7 +8,7 @@ Erlunit 0.2 - README
 
  Files       : erlunit.erl, sample.erl, test.erl
  Description : Simple test functions for Erlang code
- Version     : 0.2
+ Version     : 0.2.1/alpha
  Status      : alpha
  Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
  License     : MIT - see below 
@@ -43,6 +43,8 @@ But if you'd still like to use something a tad more baroque, yet simple, this
 package here may be a start. Best, start reading the beginning of sample.erl.
 
 Note that this is not the 'Erlunit' that some web pages mentioned prior to 2010.
+
+In sample.erl you also find links to EUnit and etap, you may want to look at.
 
 
 Samples

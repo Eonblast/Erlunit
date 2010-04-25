@@ -1,14 +1,14 @@
-Erlunit 0.2.1/alpha - ROADMAP
+Erlunit 0.2.2/alpha - ROADMAP
 
 
 Mail hd2010@eonblast.com with requests. No promisses:
 
 
-0.3 - docs for existing checks
-   
-    - unregister stats counter process correctly
+0.3 - unregister stats counter process correctly
     
     - terminal colors
+    
+    - execute as message
     
 0.4 - adding checks & do more applied testing
 

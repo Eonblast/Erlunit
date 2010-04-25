@@ -1,0 +1,635 @@
+Erlunit 0.2.2/alpha - MANUAL
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+Copyright (c) 2010 Eonblast Corporation http://www.eonblast.com
+
+
+== Index ==
+
+ Start Up
+ * Very Quick Start: quick.erl
+ * Quick Start
+ * Download & Installation
+ * Samples: sample.erl
+ * Quick Check
+ * Support
+ * Home
+
+ Reference	
+ * Tests
+ * Suties
+ * Checks
+ 
+ Theory
+ * Why would you use this?
+ * Why would you not use this?
+ * Links
+ * MIT License
+
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+== Very Quick Start: quick.erl ==
+
+ * Get Erlunit from http://github.com/hdiedrich/erlunit/tarball/master
+
+ * Extract, go into that dir and do:
+ 
+   $ erl
+   1> c(erlunit), c(quick), quick:run().
+ 
+ * Take a look at quick.erl
+ 
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+== On Tests  ==
+
+"I do use a form of micro testing that is built into Erlang." - Joe Armstrong
+
+Joe Armstrong describes how you don't really need a test frame work in many 
+situations, because the pattern matching in Erlang can be used for testing:
+
+http://armstrongonsoftware.blogspot.com/2009/01/micro-lightweight-unit-testing.html
+
+But if you'd still like to use something a tad more baroque, yet simple, this 
+package here may be a start. Best, start reading the beginning of sample.erl
+and try those samples 
+
+$ erl
+1> c(erlunit), c(sample), sample:sample1.
+   ...                             ... 2.
+   ...
+
+Tests are written to test functions of your own source. There is a
+a lot to be said for writing tests for your source and even write
+test before you write your source: to clarify and define your task
+and to make life easier once you change implementations.
+
+See http://www.c2.com/cgi/wiki?TestDrivenDevelopment for more.
+
+Note that your code comes into play where 1 is used in this first 
+sample. Eg. to test your function Foo() that is expected to always
+result into 42 when fed with a bar, you'd write a test like this: 
+equal(Foo(bar), 42). This way you have a test coded that will make
+sure that Foo(bar) still results into 42, whenever you run it, no
+matter how many source iterations later you come back to it.
+
+
+Note that this is not the 'Erlunit' that some web pages mentioned prior to 2010.
+
+
+=== Alternate notation ===
+
+Erlunit allows for sequential and message passing notation:
+
+sample1() ->
+
+	erlunit:start(),
+	erlunit:equal(1, 1),
+	...
+	erlunit:execute().
+
+sample2() ->
+
+	Test = erlunit:start(),
+	Test ! { equal, 1, 1 },
+	...
+	Test ! execute.
+
+
+'Suites' are used to group individual tests. 
+
+A suite is created with erlunit:suite("<suite name>"). Tests are
+grouped into the suite last created, by default.
+
+sample3() ->
+
+	erlunit:start(),
+
+	erlunit:suite("#1"),
+	erlunit:equal(100, 100),
+	...
+
+	erlunit:suite("#2"),
+	erlunit:not_equal(a, b),
+	...
+
+	erlunit:execute().
+
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+== Quick Start ==
+
+You should be making your first real tests for your own project within 5 min.
+
+{1} Copy erlunit.erl into your path (for now). 
+
+{2} Create a test file test.erl and paste into:
+
+-import(your_module_to_be_tested.erl) 
+-import(erlunit.erl) 
+
+run() ->
+
+	erlunit:start(),
+	erlunit:true(yourFunToBeTested(ATestValue) == TheExpectedResult),
+	erlunit:execute().
+
+{3} Compile & Run it:
+
+# erl
+1> c(your_module_to_be_tested), c(erlunit), c(test), test:run().
+
+Done. 
+
+=== Message Passing Notation ===
+
+There is a message passing notation that allows for concurrent tests:
+
+	Test = erlunit:start(),
+	Test ! { true, yourFun(ATestValue) == TheExpectedResult },
+	Test ! execute.
+
+=== Other Checks ===
+
+This first test uses true(). Other checks are: false, equal, bigger, lesser, pass, 
+fail, throws, error, exits.
+
+In more detail:
+
+ * erlunit:true(A)                 resp.: { true, A }
+ * erlunit:false(A)                       { false, A } 
+ * erlunit:equal(A, B)                    { equal, A, B }
+ * erlunit:bigger(A, B)                   ...
+ * erlunit:lesser(A, B)
+
+ * erlunit:pass(Fun)
+ * erlunit:fail(Fun)
+ * erlunit:throws(Fun)
+ * erlunit:error(Fun)
+ * erlunit:exits(Fun)
+
+They can all take an optional description text as last parameter:
+
+ * erlunit:true(A, Descr)          resp.: { true, A, Descr }   
+ * erlunit:false(A, Descr)                { false, A, Descr }
+ * erlunit:equal(A, B, Descr)             { equal, A, B, Descr }
+ * ...                                    ...
+
+You can use suites and run them concurrently. That works like this:
+
+test3() ->
+
+	erlunit:start(),
+
+	erlunit:suite("#1"),
+	erlunit:equal(100, 100),
+	% ...
+
+	erlunit:suite("#2"),
+	erlunit:not_equal(a, b),
+	% ...
+
+	erlunit:execute().
+
+Or, alternately, the Suite process takes the place of Test from above:
+
+test3() ->
+
+	erlunit:start(),
+
+	Suite1 = erlunit:suite("#1"),
+	Suite1 ! { true,  1 == 1 },
+	% ...
+
+	Suite2 = erlunit:suite("#2"),
+	Suite2 ! { not_equal, 1,  2 },
+	% ...
+
+	erlunit:execute().
+
+See sample.erl for more samples. See 'Checks' for a complete list of checks.
+
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+== Support ==
+
+Mail to hd2010@eonblast.com with questions and suggestions, I will be happy
+to answer. - Henning
+
+  
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+== Home ==
+
+http://wiki.github.com/Eonblast/Erlunit/
+
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+== Download & Install ==
+
+TAR: http://github.com/hdiedrich/erlunit/tarball/master
+     Bounces you to latest tarball. E.g.: Eonblast-Erlunit-94148e3.tar.gz
+
+ZIP: http://github.com/hdiedrich/erlunit/zipball/master
+     Bounces you to latest zip. E.g.: Eonblast-Erlunit-94148e3.zip
+
+All you need is erlunit.erl:
+
+a) Just copy erlunit.erl into your path.
+   That can be right into your main directory for starters. 
+
+   - or -
+
+b) Put the whole tar/zip contents into a subdirectory erlunit/:
+
+   (<GITTAG> == e.g. 94148e3)
+
+  $ mv Eonblast-Erlunit-<GITTAG>.tar.gz my_project_folder
+  $ cd my_project_folder
+  $ tar xvzf Eonblast-Erlunit-<GITTAG>.tar.gz
+  $ mv Eonblast-Erlunit-<GITTAG> erlunit
+
+  Now the Erlunit files are in my_project_folder/erlunit. Test it:
+	
+  $ cd my_project_folder/erlunit
+  $ erl
+  1> c(erlunit), c(test), test:run().
+  
+  - or -
+
+c) Pull from git
+   http://github.com/Eonblast/Erlunit/pull_request/ 
+
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+== Samples: sample.erl ==
+
+	erlunit:start(),                              % initializes & prints heads
+	erlunit:true(1 == 1,"1 and 1 are equal"),     % stages tests
+	...
+	erlunit:execute().                            % executes & prints results
+
+That's it. Read more in sample.erl.
+
+
+Using Suites:
+
+	erlunit:start(),                              % initializes & prints heads
+	erlunit:suite("Suite 1"),                     % initialize a suite
+	erlunit:true(1 == 1,"1 and 1 are equal"),     % mounts tests 
+	...
+	erlunit:execute().                            % executes & prints results
+
+Suites are used for organizing tests that belong together. More in sample.erl.
+
+
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+== Quick Check ==
+
+For a quick check, run, in the folder where Erlunit resides, do 
+
+$ erl
+1> c(erlunit), c(quick), quick:run(). 
+
+A lot more samples are in sample.erl: 1> c(erlunit), c(sample), sample:run(). 
+They can be run one at a time: 2> sample:sample1(). ...
+To test Erlunit itself: {ok,_} = c(erlunit), {ok,_} = c(testtest), testtest:run().
+
+These other files can be executed and inspected:
+
+ > c(erlunit), c(quick), quick:run(). 
+ > c(erlunit), c(template), template:run(). 
+ > c(erlunit), c(sample), sample:sample1(). 
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+
+== Tests ==
+
+	Tests are written to test functions of your own source. There is a
+	a lot to be said for writing tests for your source and even write
+	test before you write your source: to clarify and define your task
+	and to make life easier once you change implementations.
+	
+	See http://www.c2.com/cgi/wiki?TestDrivenDevelopment for more.
+	
+	Note that your code comes into play where 1 is used in this first 
+	sample. Eg. to test your function Foo() that is expected to always
+	result into 42 when fed with a bar, you'd write a test like this: 
+	equal(Foo(bar), 42). This way you have a test coded that will make
+	sure that Foo(bar) still results into 42, whenever you run it, no
+	matter how many source iterations later you come back to it.
+
+
+	Imperative                    - or -            Message Passing
+	-------------------------                       ------------------------ 
+	 
+	 erlunit:start(),                               Test = erlunit:start(),
+	 erlunit:true(A),                               Test ! { true, A },
+	 erlunit:execute().                             Test ! execute.
+
+	
+== Suites ==
+	
+	'Suites' are used to group individual tests. 
+	
+	A suite is created with erlunit:suite("<suite name>"). Tests are
+	grouped into the suite last created, by default.	
+		
+	
+	 Imperative                    - or -            Message Passing
+	 -------------------------                       ------------------------ 
+	 
+	  erlunit:start(),                               Test  = erlunit:start(),
+	  erlunit:suite("SuiteName"),                    Suite = erlunit:suite("SuiteName"),
+	  erlunit:true(A, B),                            Suite ! { true, yourFun(ATestValue) == TheExpectedResult },
+	  erlunit:execute().                             Test  ! execute.
+
+
+	Suites can be run concurrently. Running those samples will show how the
+	individual checks of both suits are neatly interleaving. This only works 
+	with the message passing notation. It exploits the effect
+	that the suites are 'loaded' with checks pretty fast and the actual
+	execution of the checks doesn't start before erlunit:execute() is called.
+	Which in effect mostly means: wait for the suites to get done. And so it
+	waits and gives the suites the chance to use the cpu time between them.
+	
+	
+	
+== Checks ==
+	
+	Checks are called:
+
+	 Imperative                    - or -            Message Passing
+	 -------------------------                       ------------------------ 
+	 erlunit:<name>([<suite>, ] <param> [,<Descr>])     [<test or suite>] ! { <name>, <param> [, Descr] }
+	
+	[ ] here is to mean 'optional', not 'Erlang list'.
+	
+	<name>          is one of:
+	                true, false, equal, bigger, lesser
+	                pass, fail, throws, error, exits
+	                not_true, not_false, not_equal
+
+	<suite>         is a suite process, created by suite().
+
+	<test or suite> are either a test process or a suite process, which are
+		            returned by start() and suite() respectively.
+
+	<param>         are your parameters to the check. The actual meat to it all.
+	
+	<Descr>         is your description string to recognize the individual check
+	                in the test log, especially in case it fails.
+	
+	<test or suite> are either a test process or a suite process, which are
+		            returned by start() and suite() respectively.
+
+	
+	
+	The complete list of checks:
+	
+	 Imperative                    - or -            Message Passing
+	 -------------------------                       ------------------------ 
+	 * erlunit:true(A)                               Test ! { true, A }
+	 * erlunit:false(A)                              Test ! { false, A } 
+	 * erlunit:equal(A, B)                           Test ! { equal, A, B }
+	 * erlunit:bigger(A, B)                          Test ! { bigger, A, B }
+	 * erlunit:lesser(A, B)                          Test ! { lesser, A, B }
+	
+	 * erlunit:pass(Fun)                             Test ! { pass, Fun }
+	 * erlunit:fail(Fun)                             Test ! { fail, Fun }
+	 * erlunit:throws(Fun)                           Test ! { throws, Fun }
+	 * erlunit:error(Fun)                            Test ! { error, Fun }
+	 * erlunit:exits(Fun)                            Test ! { exits, Fun }
+	
+	 * erlunit:not_true(A)                           Test ! { not_true, A }
+	 * erlunit:not_false(A)                          Test ! { not_false, A } 
+	 * erlunit:not_equal(A, B)                       Test ! { not_equal, A, B }
+	
+	
+	They can all take an optional description text as last parameter:
+	
+	 Imperative                    - or -            Message Passing
+	 -------------------------                       ------------------------ 
+	 * erlunit:true(A)                               Test ! { true, A }
+	 * erlunit:false(A)                              Test ! { false, A } 
+	 * erlunit:equal(A, B)                           Test ! { equal, A, B }
+	 * erlunit:bigger(A, B)                          Test ! { bigger, A, B }
+	 * erlunit:lesser(A, B)                          Test ! { lesser, A, B }
+	
+	 * erlunit:pass(Fun)                             Test ! { pass, Fun }
+	 * erlunit:fail(Fun)                             Test ! { fail, Fun }
+	 * erlunit:throws(Fun)                           Test ! { throws, Fun }
+	 * erlunit:error(Fun)                            Test ! { error, Fun }
+	 * erlunit:exits(Fun)                            Test ! { exits, Fun }
+	
+	 * erlunit:not_true(A)                           Test ! { not_true, A }
+	 * erlunit:not_false(A)                          Test ! { not_false, A } 
+	 * erlunit:not_equal(A, B)                       Test ! { not_equal, A, B }
+    
+
+
+    All checks accept a Suite that they belong to, as shown below. This
+    can be combined with the description above. If no Suite is specified, the
+    check is sorted into the last created suite. If no suite was created, they
+    are automatically in an internal default suite.	
+
+	 Imperative                    - or -            Message Passing
+	 -------------------------                       ------------------------ 
+	 * erlunit:true(Suite, A)                        Suite ! { true, A }
+	 * erlunit:false(Suite, A)                       Suite ! { false, A } 
+	 * erlunit:equal(Suite, A, B)                    Suite ! { equal, A, B }
+	 * erlunit:bigger(Suite, A, B)                   Suite ! { bigger, A, B }
+	 * erlunit:lesser(Suite, A, B)                   Suite ! { lesser, A, B }
+	
+	 * erlunit:pass(Suite, Fun)                      Suite ! { pass, Fun }
+	 * erlunit:fail(Suite, Fun)                      Suite ! { fail, Fun }
+	 * erlunit:throws(Suite, Fun)                    Suite ! { throws, Fun }
+	 * erlunit:error(Suite, Fun)                     Suite ! { error, Fun }
+	 * erlunit:exits(Suite, Fun)                     Suite ! { exits, Fun }
+	
+	 * erlunit:not_true(Suite, A)                    Suite ! { not_true, A }
+	 * erlunit:not_false(Suite, A)                   Suite ! { not_false, A } 
+	 * erlunit:not_equal(Suite, A, B)                Suite ! { not_equal, A, B }
+
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+== Why would you use this? ==
+
+You could be making your first real tests for your own project in 5 min.
+
+
+{1}
+
+Copy erlunit.erl into your path  
+
+{2}
+
+Create a test file test.erl and paste into:
+
+-import(your_module_to_be_tested.erl) 
+-import(erlunit.erl) 
+
+run() ->
+
+	erlunit:start(),
+	erlunit:true(yourFunToBeTested(ATestValue) == TheExpectedResult),
+	erlunit:execute().
+
+{3}
+
+Compile & Run it, done:
+
+# erl
+1> c(erlunit), c(test), test:run().
+
+Done. Other checks are: false, equal, bigger, lesser, pass, fail, throws,
+error, exits.
+
+Continue reading above, 'Quick Start'.
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+== Why would you not use this? ==
+
+E r l u n i t  is a naive approach at an academically discussed issue.
+There are Erlang masters on the 'erlang-questions' list, this here package
+ist not written by one. Beware of copying mistakes if you are learning.
+
+Thus consider these two serious contenders who deserve your attention: 
+
+E U n i t - by Richard Carlsson and Michaêl Rémond:
+"EUnit is a unit testing framework for Erlang. It is very powerful and 
+flexible, is easy to use, and has small syntactical overhead."
+http://svn.process-one.net/contribs/trunk/eunit/doc/overview-summary.html
+
+e t a p - by Jeremy Wall, Paul J. Davis, Nick Gerakines et al:
+"etap is a collection of Erlang modules that provide a TAP testing client
+library. These modules allow developers to create extensive and compre-
+hensive tests covering many aspects of application and module development. 
+This includes simple assertions, exceptions, the application behavior and
+event web requests." http://github.com/ngerakines/etap/downloads
+
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+== Links ==
+
+Unit Testing
+ * http://en.wikipedia.org/wiki/Unit_testing
+
+Erlang Unit Test Frameworks
+ * EUnit: http://svn.process-one.net/contribs/trunk/eunit/doc/overview-summary.html
+ * etap: http://github.com/ngerakines/etap/downloads
+
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+== License ==
+
+Copyright (c) 2010 Eonblast Corporation http://www.eonblast.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice, including link, and this permission notice shall 
+be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+http://www.opensource.org/licenses/mit-license.php
+
+
+----------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
+---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
+----------------------------------------------------------------------------o--
+
+ File        : MANUAL
+ Description : Description of Erlunit
+ Type        : Documentation
+ Version     : 0.2.2/alpha
+ Status      : alpha
+ Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
+ License     : MIT - see above 
+ Author      : H. Diedrich <hd2010@eonblast.com>
+ Created     : 24 Apr 2010
+ Changed     : 24 Apr 2010 - also see CHANGES
+
+----------------------------------------------------------------------------o--

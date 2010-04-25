@@ -1,7 +1,7 @@
 %%%----------------------------------------------------------------------------
 %%% File        : erlunit.erl
 %%% Description : Test functions
-%%% Version     : 0.2.1/alpha
+%%% Version     : 0.2.2/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - see below 
@@ -61,7 +61,7 @@
 %%%----------------------------------------------------------------------------
 
 -module(erlunit).
--vsn("0.2.1/alpha").
+-vsn("0.2.2/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -78,7 +78,7 @@
 -export([equal/3, not_equal/3, bigger/3, lesser/3]).
 
 -export([echo/1, echo/2]).
--export([banner/0, banner/1, strong_banner/1, center/2]).
+-export([banner/0, banner/1, strong_banner/1, strong_banner/2, center/2]).
 -export([vecho/2, vecho/3]).
 -export([alive/1]).
 
@@ -86,7 +86,7 @@
 
 %%%----------------------------------------------------------------------------
 
--define(VERSION, "0.2.1/alpha").
+-define(VERSION, "0.2.2/alpha").
 -define(LIBRARY, "Erlunit").
 -define(COPYRIGHT, "(c) 2010 Eonblast Corporation http://www.eonblast.com").
 
@@ -476,7 +476,7 @@ start() ->
 	echo("Start of Tests."),
 	register(main, self()),
 
-	Stats = spawn(fun() -> stats("Overall") end),
+	Stats = spawn(fun() -> stats("All") end),
 	register(stats, Stats),
 
 	glist(suitenames), % mind you, before first suite() call.
@@ -596,7 +596,7 @@ suite(Nom, Flags) when is_list(Nom), is_list(Flags) ->
 	vecho(?V1, "~s~nStarting Suite ~s.", [line(), Nom]),
 	
 	case lists:member(inverted, Flags) of
-		true ->	strong_banner(Nom ++ ": " ++ ?INVERT);
+		true ->	strong_banner(Nom ++ ": " ++ ?INVERT, 0);
 		_ -> nil
 	end,
 	
@@ -1151,9 +1151,10 @@ banner(Message) ->
 %%%----------------------------------------------------------------------------
 %%% Centered banner with text only:
 
-strong_banner(Text) ->
+strong_banner(Text) -> strong_banner(Text, 1).
+strong_banner(Text, EmptyRows) ->
 
-    io:format("~n~s~n~s~s~n~s~n",[dashline(), center_indent(Text, ?WIDTH), Text, dashline()]).
+    io:format("~s~s~n~s~s~n~s~n",[string:chars(13, EmptyRows), dashline(), center_indent(Text, ?WIDTH), Text, dashline()]).
 
 %%%----------------------------------------------------------------------------
 %%% Centering a headline

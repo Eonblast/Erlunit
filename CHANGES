@@ -1,4 +1,11 @@
-Erlunit 0.2.1/alpha - CHANGES
+Erlunit 0.2.2/alpha - CHANGES
+
+0.2.2   24 Apr 2010 - Docs
+
+		+  added MANUAL file
+        +  added quick start file quick.erl
+        +  added template files test.erl, template.erl
+
 
 0.2.1   23 Apr 2010 - More Checks, more tests
 
