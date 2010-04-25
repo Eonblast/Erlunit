@@ -22,7 +22,7 @@ Erlunit 0.2.2/alpha - README
 Download from github: http://github.com/hdiedrich/erlunit/tarball/master
 
 For samples, see sample.erl. It's written to be read top down.
-View it at: http://github.com/hdiedrich/erlunit/blob/master/sample.erl
+View it at: http://github.com/Eonblast/Erlunit/blob/master/sample.erl
 
 For a quick check, run 1> c(erlunit), c(sample), sample:sample1(). 
 
