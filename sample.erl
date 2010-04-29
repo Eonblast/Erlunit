@@ -1,7 +1,7 @@
 %%%----------------------------------------------------------------------------
 %%% File        : sample.erl
 %%% Description : Sample usage of test functions in erlunit.erl
-%%% Version     : 0.2.2/alpha
+%%% Version     : 0.2.3/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - http://www.opensource.org/licenses/mit-license.php 
@@ -23,20 +23,21 @@
 %%%
 %%%----------------------------------------------------------------------------
 %%%
-%%% Usage is: 'reading this source'. 
+%%% Usage: reading and run. 
 %%%
-%%% Run it though to find out if it all compiles on your machine:
+%%%      To find out if it all compiles on your machine:
 %%%  
 %%%      #  erl
 %%%      1> {ok,_} = c(erlunit), {ok,_} = c(sample), sample:run().
 %%%  
-%%% To later try individual samples, do (1, 2, 3, 4, 5, 10):
+%%%      
+%%%      To try individual samples, do (1, 2, 3, 4, 5, 10):
 %%%
 %%%      #  erl
 %%%      1> c(erlunit), c(sample), sample:sample1().
 %%%
 %%%----------------------------------------------------------------------------
-%%%
+%%% :                                                                         : 
 %%% : E r l u n i t - is a naive approach at an academically discussed issue. :
 %%% : There are Erlang masters on the erlang-questions list, this here source :
 %%% : ist not written by one. Beware of copying mistakes if you are learning. :
@@ -49,22 +50,23 @@
 %%% : http://svn.process-one.net/contribs/trunk/eunit/doc/overview-summary.html
 %%% :                                                                         :
 %%% : e t a p - by Jeremy Wall, Paul J. Davis, Nick Gerakines et al.          :
-%%% : "etap is a collection of Erlang modules that provide a TAP testing client
-%%% : library. These modules allow developers to create extensive and compre- :
-%%% : hensive tests covering many aspects of application and module development. 
-%%% : This includes simple assertions, exceptions, the application behavior and
-%%% : event web requests." http://github.com/ngerakines/etap/downloads        :
-%%%                                                                          
+%%% : "etap is a collection of Erlang modules that provide a TAP testing      :
+%%% : client library. These modules allow developers to create extensive and  :
+%%% : comprehensive tests covering many aspects of application and module     :
+%%% : development. This includes simple assertions, exceptions, the           :
+%%% : application behavior and event web requests."                           :
+%%% : - http://github.com/ngerakines/etap/downloads                           :
+%%% :                                                                         : 
 %%%----------------------------------------------------------------------------
 %%% :                                                                         :
 %%% : Mail to hd2010@eonblast.com with questions and suggestions, I will be   :
 %%% : happy to answer. - Henning                                              :
-%%%
+%%% :                                                                         : 
 %%%----------------------------------------------------------------------------
 
 -module(sample).
 
--vsn("0.2.2/alpha").
+-vsn("0.2.3/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -78,7 +80,7 @@
 
 -compile({nowarn_unused_function, [banner/1]}).
 
--define(VERSION, "0.2.2/alpha").
+-define(VERSION, "0.2.3/alpha").
 -define(PROGRAM, "Test Samples").
 
 %%%****************************************************************************

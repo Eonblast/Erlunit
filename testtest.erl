@@ -2,7 +2,7 @@
 %%% File        : testtest.erl
 %%% Description : Test of test functions in erlunit.erl
 %%% Type        : Internal, for development of Erlunit
-%%% Version     : 0.2.2/alpha
+%%% Version     : 0.2.3/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - http://www.opensource.org/licenses/mit-license.php 
@@ -37,7 +37,7 @@
 
 -module(testtest).
 
--vsn("0.2.2/alpha").
+-vsn("0.2.3/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -51,7 +51,7 @@
 
 %-export([one/0]).
 
--define(VERSION, "0.2.2/alpha").
+-define(VERSION, "0.2.3/alpha").
 -define(PROGRAM, "Test-Test").
 
 %%%****************************************************************************

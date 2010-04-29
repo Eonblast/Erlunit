@@ -1,7 +1,7 @@
 %%%----------------------------------------------------------------------------
 %%% File        : erlunit.erl
 %%% Description : Test functions
-%%% Version     : 0.2.2/alpha
+%%% Version     : 0.2.3/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - see below 
@@ -61,7 +61,7 @@
 %%%----------------------------------------------------------------------------
 
 -module(erlunit).
--vsn("0.2.2/alpha").
+-vsn("0.2.3/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -86,7 +86,7 @@
 
 %%%----------------------------------------------------------------------------
 
--define(VERSION, "0.2.2/alpha").
+-define(VERSION, "0.2.3/alpha").
 -define(LIBRARY, "Erlunit").
 -define(COPYRIGHT, "(c) 2010 Eonblast Corporation http://www.eonblast.com").
 
@@ -127,13 +127,13 @@ true(A, Message) -> true(whereis(suite), A, Message).
 
 true(Suite, A, Message) ->
 
-	AA = payload(A),
-
-    if AA ->
-			passed(Suite, Message, "evaluates to ~p", [AA]);
-       true ->
-			failed(Suite, Message, "evaluates to ~p, should be true but is not", [AA])
-       end.
+		AA = payload(Suite, Message, A),
+	
+		if  AA ->
+				passed(Suite, Message, "evaluates to ~p", [AA]);
+	    	true ->
+				failed(Suite, Message, "evaluates to ~p, should be true but is not", [AA])
+		end.
 
 %%%                                                                      checks
 %%%----------------------------------------------------------------------------
@@ -149,7 +149,7 @@ not_true(A, Message) -> not_true(whereis(suite), A, Message).
 
 not_true(Suite, A, Message) ->
 
-	AA = payload(A),
+	AA = payload(Suite, Message, A),
 
     if AA =/= true ->
 			passed(Suite, Message, "evaluates to ~p, not true, as it should", [AA]);
@@ -171,7 +171,7 @@ false(A, Message) -> false(whereis(suite), A, Message).
 
 false(Suite, A, Message) ->
 
-	AA = payload(A),
+	AA = payload(Suite, Message, A),
 
     if AA == false ->
 			passed(Suite, Message, "evaluates to ~p", [AA]);
@@ -193,7 +193,7 @@ not_false(A, Message) -> not_false(whereis(suite), A, Message).
 
 not_false(Suite, A, Message) ->
 
-	AA = payload(A),
+	AA = payload(Suite, Message, A),
 
     if AA =/= false ->
 			passed(Suite, Message, "evaluates to ~p, not false, as it should", [AA]);
@@ -342,15 +342,18 @@ equal(A, B, Message) -> equal(whereis(suite), A, B, Message).
 
 equal(Suite, A, B, Message) ->
 
-	AA = payload(A),
-	BB = payload(B),
+  try
+	AA = payload(Suite, Message, A),
+	BB = payload(Suite, Message, B),
 
     if 
          AA == BB ->
 			passed(Suite, Message, "~p == ~p as it should", [A, B]);
          true ->
          	failed(Suite, Message, "~p /= ~p but should be equal", [A, B])
-    end.
+    end
+  catch _:_ -> nil  
+  end.
 %%%                                                                      checks
 %%%----------------------------------------------------------------------------
 %%% not_equal
@@ -364,8 +367,8 @@ not_equal(A, B, Message) -> not_equal(whereis(suite), A, B, Message).
 
 not_equal(Suite, A, B, Message) ->
 
-	AA = payload(A),
-	BB = payload(B),
+	AA = payload(Suite, Message, A),
+	BB = payload(Suite, Message, B),
 
     if 
          AA /= BB ->
@@ -388,8 +391,8 @@ bigger(A, B, Message) -> bigger(whereis(suite), A, B, Message).
 
 bigger(Suite, A, B, Message) ->
 
-	AA = payload(A),
-	BB = payload(B),
+	AA = payload(Suite, Message, A),
+	BB = payload(Suite, Message, B),
 
     if 
          AA > BB ->
@@ -412,8 +415,8 @@ lesser(A, B, Message) -> lesser(whereis(suite), A, B, Message).
 
 lesser(Suite, A, B, Message) ->
 
-	AA = payload(A),
-	BB = payload(B),
+	AA = payload(Suite, Message, A),
+	BB = payload(Suite, Message, B),
 
     if 
          AA < BB ->
@@ -453,7 +456,7 @@ failed(Suite, Message, Result) -> failed(Suite, Message, Result, []).
 failed(Suite, Message, Result, ResultParameter) ->
 
 		SuiteName = glist_get(suitenames, Suite, ""),
-		io:format(?PROMPT ++ "- fails | ##### ~s~s ~s | " ++ Result ++ ". #####~n",
+		io:format(?PROMPT ++ "FAIL | ##### ~s~s ~s | " ++ Result ++ ". #####~n",
 			[SuiteName, iff(SuiteName,":",""), Message | ResultParameter]),
 		Suite ! failed.
 
@@ -1016,9 +1019,26 @@ glist_get(GList, Key, Default, Retry) ->
 %%%----------------------------------------------------------------------------
 %%% payload - execute if function, else return identically.
 %%%----------------------------------------------------------------------------
+%%%
+%%% Catch all exceptions and make sure they are condensed and 'thrown upward'.
 
-payload(A) when is_function(A) -> A();
-payload(A) -> A.
+payload(Suite, Message, Fun) when is_function(Fun) -> 
+
+    try 
+    	Fun()
+	catch
+    	throw:Term -> 
+    		failed(Suite, Message, "throws exception but should pass ok"),
+    		throw(Term);
+    	exit:Reason -> 
+    		failed(Suite, Message, "makes exit but should pass ok"),
+    		throw(Reason);
+    	error:Reason -> 
+    		failed(Suite, Message, "runs into error but should pass ok"),
+    		throw(Reason)
+	end;
+
+payload(_Suite, _Message, A) -> A.
 
 %%%
 %%%----------------------------------------------------------------------------
@@ -1111,7 +1131,8 @@ line(Type) ->
 	
 		if
 			Type == splendid ->
-				"==================================================================";
+				"oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo";
+%				"==================================================================";
 			Type == good ->
 				"------------------------------------------------------------------";
 			Type == bad ->

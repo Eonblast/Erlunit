@@ -1,4 +1,4 @@
-Erlunit 0.2.2/alpha - MANUAL
+Erlunit 0.2.3/alpha - MANUAL
 
 ----------------------------------------------------------------------------o--
 ---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
@@ -37,6 +37,7 @@ Copyright (c) 2010 Eonblast Corporation http://www.eonblast.com
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
 ----------------------------------------------------------------------------o--
 
+
 == Very Quick Start: quick.erl ==
 
  * Get Erlunit from http://github.com/hdiedrich/erlunit/tarball/master
@@ -47,13 +48,16 @@ Copyright (c) 2010 Eonblast Corporation http://www.eonblast.com
    1> c(erlunit), c(quick), quick:run().
  
  * Take a look at quick.erl
- 
+
+ * Take a look at sample.erl
+
 
 ----------------------------------------------------------------------------o--
 ---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
 ---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
 ----------------------------------------------------------------------------o--
+
 
 == On Tests  ==
 
@@ -64,36 +68,58 @@ situations, because the pattern matching in Erlang can be used for testing:
 
 http://armstrongonsoftware.blogspot.com/2009/01/micro-lightweight-unit-testing.html
 
-But if you'd still like to use something a tad more baroque, yet simple, this 
+
+
+If you'd still like to use something a tad more baroque, yet simple, this 
 package here may be a start. Best, start reading the beginning of sample.erl
-and try those samples 
+and try those samples:
 
 $ erl
-1> c(erlunit), c(sample), sample:sample1.
-   ...                             ... 2.
-   ...
+1> c(erlunit), c(sample), sample:sample1().
+2> c(erlunit), c(sample), sample:sample2().
+3> ...
+
+
 
 Tests are written to test functions of your own source. There is a
 a lot to be said for writing tests for your source and even write
 test before you write your source: to clarify and define your task
 and to make life easier once you change implementations.
 
-See http://www.c2.com/cgi/wiki?TestDrivenDevelopment for more.
+Fom the source at http://www.c2.com/cgi/wiki?TestDrivenDevelopment:
 
-Note that your code comes into play where 1 is used in this first 
-sample. Eg. to test your function Foo() that is expected to always
-result into 42 when fed with a bar, you'd write a test like this: 
-equal(Foo(bar), 42). This way you have a test coded that will make
-sure that Foo(bar) still results into 42, whenever you run it, no
-matter how many source iterations later you come back to it.
+"
+ * Think about what you want to do.
+ * Think about how to test it.
+ * Write a small test. Think about the desired API.
+ * Write just enough code to fail the test.
+ * Run and watch the test fail. (The test-runner, if you're using something like 
+   JUnit, shows the "Red Bar"). Now you know that your test is going to be executed.
+ * Write just enough code to pass the test (and pass all your previous tests).
+ * Run and watch all of the tests pass. (The test-runner, if you're using JUnit,
+   etc., shows the "Green Bar"). If it doesn't pass, you did something wrong,
+   fix it now since it's got to be something you just wrote.
+ * If you have any duplicate logic, or inexpressive code, refactor to remove
+   duplication and increase expressiveness -- this includes reducing coupling
+   and increasing cohesion.
+ * Run the tests again, you should still have the Green Bar. If you get the Red
+   Bar, then you made a mistake in your refactoring. Fix it now and re-run.
+ * Repeat the steps above until you can't find any more tests that drive writing
+   new code.
+
+ Note that your code comes into play where 1 is used in this first 
+ sample. Eg. to test your function Foo() that is expected to always
+ result into 42 when fed with a bar, you'd write a test like this: 
+ equal(Foo(bar), 42). This way you have a test coded that will make
+ sure that Foo(bar) still results into 42, whenever you run it, no
+ matter how many source iterations later you come back to it."
 
 
-Note that this is not the 'Erlunit' that some web pages mentioned prior to 2010.
 
 
 === Alternate notation ===
 
-Erlunit allows for sequential and message passing notation:
+Erlunit allows for sequential, and message passing notation:
 
 sample1() ->
 
@@ -109,6 +135,9 @@ sample2() ->
 	...
 	Test ! execute.
 
+
+
+=== Suites ===
 
 'Suites' are used to group individual tests. 
 
@@ -135,6 +164,7 @@ sample3() ->
 ---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
 ----------------------------------------------------------------------------o--
+
 
 == Quick Start ==
 
@@ -235,6 +265,7 @@ See sample.erl for more samples. See 'Checks' for a complete list of checks.
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
 ----------------------------------------------------------------------------o--
 
+
 == Support ==
 
 Mail to hd2010@eonblast.com with questions and suggestions, I will be happy
@@ -247,9 +278,12 @@ to answer. - Henning
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
 ----------------------------------------------------------------------------o--
 
+
 == Home ==
 
 http://wiki.github.com/Eonblast/Erlunit/
+
+Note that this is not the 'Erlunit' that some web pages mentioned prior to 2010.
 
 
 ----------------------------------------------------------------------------o--
@@ -258,13 +292,17 @@ http://wiki.github.com/Eonblast/Erlunit/
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
 ----------------------------------------------------------------------------o--
 
+
 == Download & Install ==
 
-TAR: http://github.com/hdiedrich/erlunit/tarball/master
+TAR: http://github.com/Eonblast/Erlunit/tarball/master
      Bounces you to latest tarball. E.g.: Eonblast-Erlunit-94148e3.tar.gz
 
-ZIP: http://github.com/hdiedrich/erlunit/zipball/master
+ZIP: http://github.com/Eonblast/Erlunit/zipball/master
      Bounces you to latest zip. E.g.: Eonblast-Erlunit-94148e3.zip
+
+GIT: git clone git://github.com/Eonblast/Erlunit.git erlunit
+
 
 All you need is erlunit.erl:
 
@@ -291,7 +329,8 @@ b) Put the whole tar/zip contents into a subdirectory erlunit/:
   - or -
 
 c) Pull from git
-   http://github.com/Eonblast/Erlunit/pull_request/ 
+   $ git clone git://github.com/Eonblast/Erlunit.git erlunit
+
 
 
 ----------------------------------------------------------------------------o--
@@ -299,6 +338,7 @@ c) Pull from git
 ---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
 ----------------------------------------------------------------------------o--
+
 
 == Samples: sample.erl ==
 
@@ -328,6 +368,7 @@ Suites are used for organizing tests that belong together. More in sample.erl.
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
 ----------------------------------------------------------------------------o--
 
+
 == Quick Check ==
 
 For a quick check, run, in the folder where Erlunit resides, do 
@@ -344,6 +385,7 @@ These other files can be executed and inspected:
  > c(erlunit), c(quick), quick:run(). 
  > c(erlunit), c(template), template:run(). 
  > c(erlunit), c(sample), sample:sample1(). 
+
 
 ----------------------------------------------------------------------------o--
 ---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
@@ -507,6 +549,7 @@ These other files can be executed and inspected:
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
 ----------------------------------------------------------------------------o--
 
+
 == Why would you use this? ==
 
 You could be making your first real tests for your own project in 5 min.
@@ -547,12 +590,10 @@ Continue reading above, 'Quick Start'.
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
 ----------------------------------------------------------------------------o--
 
+
 == Why would you not use this? ==
 
-E r l u n i t  is a naive approach at an academically discussed issue.
-There are Erlang masters on the 'erlang-questions' list, this here package
-ist not written by one. Beware of copying mistakes if you are learning.
-
+E r l u n i t  is a naive approach at an academically covered issue.
 Thus consider these two serious contenders who deserve your attention: 
 
 E U n i t - by Richard Carlsson and Michaêl Rémond:
@@ -574,14 +615,29 @@ event web requests." http://github.com/ngerakines/etap/downloads
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
 ----------------------------------------------------------------------------o--
 
+
 == Links ==
 
+
+Test-driven Development
+
+ * Xtreme Programming: http://c2.com/cgi/wiki?TestDrivenDevelopment
+ * Dijkstra '88: http://www.cs.utexas.edu/users/EWD/ewd10xx/EWD1012.PDF
+ * Joe Armstrong: http://armstrongonsoftware.blogspot.com/2009/01/micro-lightweight-unit-testing.html
+ * http://en.wikipedia.org/wiki/Test-driven_development
+
+
 Unit Testing
+
  * http://en.wikipedia.org/wiki/Unit_testing
 
+
 Erlang Unit Test Frameworks
+
  * EUnit: http://svn.process-one.net/contribs/trunk/eunit/doc/overview-summary.html
  * etap: http://github.com/ngerakines/etap/downloads
+ * Erlunit: http://github.com/Eonblast/Erlunit
+ 
 
 
 ----------------------------------------------------------------------------o--
@@ -589,6 +645,7 @@ Erlang Unit Test Frameworks
 ---Oo--OoO--O--O--O-Oo-O-O--O-----------------------------------------------o--
 ---Ooo-O--O-Ooo-oo--O-oO-O--O-----------------------------------------------o--
 ----------------------------------------------------------------------------o--
+
 
 == License ==
 
@@ -612,8 +669,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-http://www.opensource.org/licenses/mit-license.php
-
 
 ----------------------------------------------------------------------------o--
 ---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
@@ -624,12 +679,12 @@ http://www.opensource.org/licenses/mit-license.php
  File        : MANUAL
  Description : Description of Erlunit
  Type        : Documentation
- Version     : 0.2.2/alpha
+ Version     : 0.2.3/alpha
  Status      : alpha
  Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
  License     : MIT - see above 
  Author      : H. Diedrich <hd2010@eonblast.com>
  Created     : 24 Apr 2010
- Changed     : 24 Apr 2010 - also see CHANGES
+ Changed     : 29 Apr 2010 - also see CHANGES
 
 ----------------------------------------------------------------------------o--

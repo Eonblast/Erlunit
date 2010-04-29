@@ -1,8 +1,8 @@
 %%%----------------------------------------------------------------------------
 %%% File        : quick.erl
 %%% Description : Quick Start for erlunit.erl
-%%% Type        : Part of Documentation
-%%% Version     : 0.2.2/alpha
+%%% Type        : Documentation
+%%% Version     : 0.2.3/alpha
 %%% Status      : alpha
 %%%----------------------------------------------------------------------------
 %%%
@@ -44,7 +44,7 @@ run2() ->
 	% TRY: Alter it to ... Test ! { fail(fun() -> 1 / 0 end)) } ... and run again. 
 
 %%%----------------------------------------------------------------------------
-%%% Keys: equal, true, false, bigger, lesser, pass, fail, throws, error, exits.
+%%% Also: equal, true, false, bigger, lesser, pass, fail, throws, error, exits.
 %%% More: read sample.erl next. It's written to be read top down. Or MANUAL.
 %%% Home: http://github.com/Eonblast/Erlunit
 %%%----------------------------------------------------------------------------
