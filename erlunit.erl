@@ -1,7 +1,7 @@
 %%%----------------------------------------------------------------------------
 %%% File        : erlunit.erl
 %%% Description : Test functions
-%%% Version     : 0.2.3/alpha
+%%% Version     : 0.2.4/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - see below 
@@ -61,7 +61,7 @@
 %%%----------------------------------------------------------------------------
 
 -module(erlunit).
--vsn("0.2.3/alpha").
+-vsn("0.2.4/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -72,10 +72,12 @@
 -export([suite/1, suite/2]).
 -export([true/1, not_true/1, false/1, not_false/1, pass/1, fail/1]).
 -export([true/2, not_true/2, false/2, not_false/2, pass/2, fail/2]).
+-export([fail/4]).
 -export([exits/1, throws/1, error/1]).
 -export([exits/2, throws/2, error/2]).
 -export([equal/2, not_equal/2, bigger/2, lesser/2]).
 -export([equal/3, not_equal/3, bigger/3, lesser/3]).
+-export([equal/5]).
 
 -export([echo/1, echo/2]).
 -export([banner/0, banner/1, strong_banner/1, strong_banner/2, center/2]).
@@ -86,7 +88,7 @@
 
 %%%----------------------------------------------------------------------------
 
--define(VERSION, "0.2.3/alpha").
+-define(VERSION, "0.2.4/alpha").
 -define(LIBRARY, "Erlunit").
 -define(COPYRIGHT, "(c) 2010 Eonblast Corporation http://www.eonblast.com").
 
@@ -94,7 +96,7 @@
 -define(INDENT, "         ").
 
 -define(USERR, "This is an error in the way you use erlunit, or an error in erlunit itself.").
--define(INVERT, "This is an inverted suite. Fails are Passes, for testing the tests.").
+-define(INVERT, "This is an inverted suite. Fails count for Passes, for testing the tests.").
 
 -define(DEFAULT_SUITE_NAME, "Default Suite").
 
@@ -117,7 +119,7 @@
 %%% true - check if an expression returns true
 %%%----------------------------------------------------------------------------
 %%%
-%%% For true/0 see (*). That is used for a different purposed.
+%%% For true/0 see (*). That is used for a different purpose.
 
 true(msg) -> "Check for true";
 
@@ -239,18 +241,22 @@ fail(Fun) when is_function(Fun) -> fail(Fun, fail(msg)).
 
 fail(Fun, Message) when is_function(Fun) -> fail(whereis(suite), Fun, Message).
 
-fail(Suite, Fun, Message) when is_function(Fun) ->
+fail(Suite, Fun, Message) when is_function(Fun) -> fail(Suite, Fun, Message, "", "").
+
+fail(Fun, Message, Module, Line) when is_function(Fun) -> fail(whereis(suite), Fun, Message, Module, Line).
+
+fail(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
 
     try 
-    	Fun(),
-    	failed(Suite, Message, "passes ok but should fail")
+    	Result = Fun(),
+    	failed(Suite, Message, "passes ok (~p) but should fail | ~p  ~p", [Result, Module, Line])
 	catch
     	throw:_Term -> 
-    		passed(Suite, Message, "throws exception, so fails as it should");
+    		passed(Suite, Message, "throws exception, failing as it should");
     	exit:_Reason -> 
-    		passed(Suite, Message, "makes exit, so fails as it should");
+    		passed(Suite, Message, "makes exit, failing as it should");
     	error:_Reason -> 
-    		passed(Suite, Message, "runs into error, so fails as it should")
+    		passed(Suite, Message, "runs into error, failing as it should")
 	end.
 
 %%%                                                                      checks
@@ -340,7 +346,11 @@ equal(A, B) -> equal(A, B, equal(msg)).
 
 equal(A, B, Message) -> equal(whereis(suite), A, B, Message).
 
-equal(Suite, A, B, Message) ->
+equal(Suite, A, B, Message) when is_pid(Suite) -> equal(Suite, A, B, Message, "", "").
+
+equal(A, B, Message, Module, Line) -> equal(whereis(suite), A, B, Message, Module, Line).
+
+equal(Suite, A, B, Message, Module, Line) when is_pid(Suite) -> 
 
   try
 	AA = payload(Suite, Message, A),
@@ -348,12 +358,13 @@ equal(Suite, A, B, Message) ->
 
     if 
          AA == BB ->
-			passed(Suite, Message, "~p == ~p as it should", [A, B]);
+			passed(Suite, Message, "~p as it should", [AA]);
          true ->
-         	failed(Suite, Message, "~p /= ~p but should be equal", [A, B])
+         	failed(Suite, Message, "~p /= ~p but should be equal | ~w ~w", [AA, BB, Module, Line])
     end
   catch _:_ -> nil  
   end.
+  
 %%%                                                                      checks
 %%%----------------------------------------------------------------------------
 %%% not_equal
@@ -372,9 +383,9 @@ not_equal(Suite, A, B, Message) ->
 
     if 
          AA /= BB ->
-			passed(Suite, Message, "~p /= ~p as it should", [A, B]);
+			passed(Suite, Message, "~p /= ~p as it should", [AA, BB]);
          true ->
-         	failed(Suite, Message, "~p == ~p but should NOT be equal", [A, B])
+         	failed(Suite, Message, "~p == ~p but should NOT be equal", [AA, BB])
        end.
 
 %%%                                                                      checks
@@ -480,12 +491,12 @@ start() ->
 	register(main, self()),
 
 	Stats = spawn(fun() -> stats("All") end),
-	register(stats, Stats),
+	force_register(stats, Stats),
 
 	glist(suitenames), % mind you, before first suite() call.
 	
 	DefaultSuite = spawn(fun() -> suite(?DEFAULT_SUITE_NAME, [], self()) end),
-	register(suite, DefaultSuite),
+	force_register(suite, DefaultSuite),
 	self() ! { add, DefaultSuite, ?DEFAULT_SUITE_NAME },
 		
 	main.
@@ -566,10 +577,10 @@ execute_loop(Phase, SuitesActive, SuitesToPrint) ->
 
 		finis ->
 			timer:sleep(200), % allow rogue processes to finish
-			safe_unregister(suitenames),
-			safe_unregister(suite),
-			safe_unregister(stats),
-			safe_unregister(main),
+			force_unregister(suitenames),
+			force_unregister(suite),
+			force_unregister(stats),
+			force_unregister(main),
 			complete;
 
 		Any -> 
@@ -609,9 +620,7 @@ suite(Nom, Flags) when is_list(Nom), is_list(Flags) ->
 	main ! { add, Suite, Nom },
 
 	% register as default suite	
-	Prev = whereis(suite),
-	if Prev /= undefined -> unregister(suite); true -> nil end,
-	register(suite, Suite),
+	force_register(suite, Suite),
 	
 	Suite.
 %%%	                                                                     
@@ -912,7 +921,7 @@ stats_loop(Nom, Passed, Failed, Crashed) ->
 glist(AtomName) ->
 
 	GList = spawn(fun() -> glist_loop() end),
-	register(AtomName, GList),
+	force_register(AtomName, GList),
 	GList.
 	
 %%%
@@ -1034,7 +1043,7 @@ payload(Suite, Message, Fun) when is_function(Fun) ->
     		failed(Suite, Message, "makes exit but should pass ok"),
     		throw(Reason);
     	error:Reason -> 
-    		failed(Suite, Message, "runs into error but should pass ok"),
+    		failed(Suite, Message, "runs into error (~p) but should pass ok", [Reason]),
     		throw(Reason)
 	end;
 
@@ -1042,14 +1051,29 @@ payload(_Suite, _Message, A) -> A.
 
 %%%
 %%%----------------------------------------------------------------------------
-%%% safe_unregister - unregister w/o complaint if missing
+%%% force_unregister - unregister w/o complaint if missing.
 %%%----------------------------------------------------------------------------
+%%%
+%%% For cleanup at closing down of the main test program thread.
 
-safe_unregister(Name) ->
+force_unregister(Name) ->
 
-	Registered = whereis(Name) /= undefined,
+	case whereis(Name) of
+		undefined -> nil;
+		_ -> unregister(Name)
+	end.
+%%%
+%%%----------------------------------------------------------------------------
+%%% force_register - register w/o complaint if already existing. 
+%%%----------------------------------------------------------------------------
+%%%
+%%% Avoids argument errors for already registered processes during program
+%%% restarts right after crashed runs. TODO: in stats and suits add time out.
 
-	if Registered -> unregister(Name); true -> nil end.
+force_register(Name, Process) ->
+
+	force_unregister(Name),
+	register(Name, Process).
 %%%
 %%%----------------------------------------------------------------------------
 %%% if-function

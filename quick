@@ -1,0 +1,1 @@
+ erlc erlunit.erl; erlc quick.erl; erl -s quick run -s init stop

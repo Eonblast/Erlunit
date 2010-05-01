@@ -1,13 +1,20 @@
-Erlunit 0.2.3/alpha - CHANGES
+Erlunit 0.2.4/alpha - CHANGES
 
-0.2.3   25 Apr 2010 - Hardened -
+0.2.4   01 May 2010
 
-		+  wrapped any Fun parameter in try/catch.
+		+ unregister sub processes correctly at restart after crash 
+		+ added first macros, header erlunit.hrl
+		+ added bash scripts quick, sample, test
+
+
+0.2.3   29 Apr 2010 - Hardened - 9c59d35d0bb1824584fe	
+
+        +  wrapped any Fun parameter in any check in try/catch.
 		
 
 0.2.2   24 Apr 2010 - Docs Added - be587f1b1ef2664a2f6edde72c5cdd060f0bb634
 
-		+  added MANUAL file
+        +  added MANUAL file
         +  added quick start file quick.erl
         +  added template files test.erl, template.erl
 

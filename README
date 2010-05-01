@@ -1,4 +1,4 @@
-Erlunit 0.2.3/alpha - README
+Erlunit 0.2.4/alpha - README
 
 ------------------------------------------------------------------------o--
 ---ooo-ooo--o--o--o-o--o-o-ooo------------------------------------------o--
@@ -8,7 +8,7 @@ Erlunit 0.2.3/alpha - README
 
  Files       : erlunit.erl, sample.erl, test.erl
  Description : Simple test functions for Erlang code
- Version     : 0.2.3/alpha
+ Version     : 0.2.4/alpha
  Status      : alpha
  Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
  License     : MIT - see below 

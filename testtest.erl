@@ -2,7 +2,7 @@
 %%% File        : testtest.erl
 %%% Description : Test of test functions in erlunit.erl
 %%% Type        : Internal, for development of Erlunit
-%%% Version     : 0.2.3/alpha
+%%% Version     : 0.2.4/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - http://www.opensource.org/licenses/mit-license.php 
@@ -37,7 +37,7 @@
 
 -module(testtest).
 
--vsn("0.2.3/alpha").
+-vsn("0.2.4/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -46,12 +46,13 @@
 
 -export([run/0]).
 -import(erlunit).
+-include("erlunit.hrl").
 
 -compile({nowarn_unused_function, [suite_verbose/0]}).
 
 %-export([one/0]).
 
--define(VERSION, "0.2.3/alpha").
+-define(VERSION, "0.2.4/alpha").
 -define(PROGRAM, "Test-Test").
 
 %%%****************************************************************************
@@ -74,6 +75,9 @@ run() ->
 	suite_complete_verbose(),
 	suite_complete_verbose_mp(),
 	suite_complete_mp(),
+
+	suite_first_macros(),
+	suite_first_macros_inverted(),
 
 	erlunit:execute().
 
@@ -487,6 +491,70 @@ suite_verbose() ->
 
 	% using zero() for 0 to avoid Erlang compile time warnings	
 
+%%%
+%%%----------------------------------------------------------------------------
+%%% #8: first macros
+%%%----------------------------------------------------------------------------
+%%%
+%%% work in progress here.
+
+suite_first_macros() ->
+
+	erlunit:suite("#8 - first macros"),
+
+	?ERLUNIT_EQUAL(true, true),
+	?ERLUNIT_EQUAL(1, 1),
+	?ERLUNIT_EQUAL(0, 0),
+	
+	?ERLUNIT_EQUAL_MSG(true, true, "True is True"),
+	?ERLUNIT_EQUAL_MSG(1, 1, "One is One"),
+	?ERLUNIT_EQUAL_MSG(0, 0, "Zero is Zero"),
+	
+	?ERLUNIT_FAIL(1 / zero()),
+	?ERLUNIT_FAIL(exit(sic)),
+	?ERLUNIT_FAIL(throw(sic)),
+
+	?ERLUNIT_FAIL_MSG(1 / zero(), "Error: One By Zero"),
+	?ERLUNIT_FAIL_MSG(exit(sic), "Exit"),
+	?ERLUNIT_FAIL_MSG(throw(sic), "Throw"),
+
+	ok.
+
+	% using zero() for 0 to avoid Erlang compile time warnings
+
+%%%
+%%%----------------------------------------------------------------------------
+%%% #9: first macros, inverted
+%%%----------------------------------------------------------------------------
+%%%
+%%% work in progress here.
+
+suite_first_macros_inverted() ->
+
+	erlunit:suite("#9 - first macros, inverted", [inverted]),
+
+	?ERLUNIT_EQUAL(true, false),
+	?ERLUNIT_EQUAL(1, 0),
+	?ERLUNIT_EQUAL(nil, 0),
+	
+	?ERLUNIT_EQUAL_MSG(true, false, "True is False"),
+	?ERLUNIT_EQUAL_MSG(1, 2, "One is Two"),
+	?ERLUNIT_EQUAL_MSG(0, nil, "Zero is Nil"),
+	
+	% expected to crash, which will in this inverted suite count as pass:
+	?ERLUNIT_EQUAL(1 / zero(), anything),
+	?ERLUNIT_EQUAL(exit(sic), anything), 
+	?ERLUNIT_EQUAL(throw(sic), anything),
+
+	?ERLUNIT_EQUAL_MSG(1 / zero(), anything, "One By Zero"),
+	?ERLUNIT_EQUAL_MSG(exit(sic), anything, "Exit"),
+	?ERLUNIT_EQUAL_MSG(throw(sic), anything, "Throw"),
+
+	ok.
+
+	% using zero() for 0 to avoid Erlang compile time warnings
+
+%%%
 %%%****************************************************************************
 %%% UTILITY
 %%%****************************************************************************

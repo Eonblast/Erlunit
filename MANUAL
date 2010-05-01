@@ -1,4 +1,4 @@
-Erlunit 0.2.3/alpha - MANUAL
+Erlunit 0.2.4/alpha - MANUAL
 
 ----------------------------------------------------------------------------o--
 ---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
@@ -46,8 +46,33 @@ Copyright (c) 2010 Eonblast Corporation http://www.eonblast.com
  
    $ erl
    1> c(erlunit), c(quick), quick:run().
+   
+   This is what you'll see:
+-------------------------------------------------------------------------o--
+   erlunit: Start of Tests.
+   Eshell V5.7.2  (abort with ^G)
+   1> erlunit: + ok | Equality check | 1 == 1 as it should.
+   erlunit: ------------------------------------------------------------------
+   erlunit: + OK | Default Suite: all 1 tests passed.
+   erlunit: ------------------------------------------------------------------
+   erlunit: oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+   erlunit: All passed - Tests: 1, Passed: 1, Failed: 0, Crashes: 0
+   erlunit: oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+-------------------------------------------------------------------------o--
+
  
- * Take a look at quick.erl
+ * Take a look at quick.erl:
+----------------------------------------------------------------------------o--
+   -module(quick).
+   -import(erlunit).
+   -export([run/0]).
+
+   run() ->
+
+	   erlunit:start(),
+	   erlunit:equal(1, 1),
+	   erlunit:execute().
+----------------------------------------------------------------------------o--
 
  * Take a look at sample.erl
 
@@ -679,7 +704,7 @@ THE SOFTWARE.
  File        : MANUAL
  Description : Description of Erlunit
  Type        : Documentation
- Version     : 0.2.3/alpha
+ Version     : 0.2.4/alpha
  Status      : alpha
  Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
  License     : MIT - see above 

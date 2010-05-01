@@ -2,7 +2,7 @@
 %%% File        : quick.erl
 %%% Description : Quick Start for erlunit.erl
 %%% Type        : Documentation
-%%% Version     : 0.2.3/alpha
+%%% Version     : 0.2.4/alpha
 %%% Status      : alpha
 %%%----------------------------------------------------------------------------
 %%%

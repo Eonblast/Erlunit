@@ -1,0 +1,1 @@
+ erlc erlunit.erl; erlc sample.erl; erl -s sample run -s init stop
