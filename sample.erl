@@ -1,13 +1,13 @@
 %%%----------------------------------------------------------------------------
 %%% File        : sample.erl
 %%% Description : Sample usage of test functions in erlunit.erl
-%%% Version     : 0.2.4/alpha
+%%% Version     : 0.2.5/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - http://www.opensource.org/licenses/mit-license.php 
 %%% Author      : H. Diedrich <hd2010@eonblast.com>
 %%% Created     : 18 Apr 2010
-%%% Changed     : 23 Apr 2010 - see CHANGES
+%%% Changed     : 03 May 2010 - see CHANGES
 %%% Tested on   : Erlang R13B01
 %%%----------------------------------------------------------------------------
 %%%
@@ -66,7 +66,7 @@
 
 -module(sample).
 
--vsn("0.2.4/alpha").
+-vsn("0.2.5/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -74,13 +74,14 @@
 %%%----------------------------------------------------------------------------
 
 -export([run/0, sample1/0, sample2/0, sample3/0, sample4/0, sample5/0]).
--export([sample10/0]).
+-export([sample9/0,sample10/0]).
 
 -import(erlunit).
+-include("erlunit.hrl").
 
 -compile({nowarn_unused_function, [banner/1]}).
 
--define(VERSION, "0.2.4/alpha").
+-define(VERSION, "0.2.5/alpha").
 -define(PROGRAM, "Test Samples").
 
 %%%****************************************************************************
@@ -265,6 +266,47 @@ sample5() ->
 	% --- # erl
 	% --- 1> c(erlunit), c(sample), sample:sample5().
 
+%%%****************************************************************************
+%%% #9 SIMPLE SAMPLE - MACROS WITH SUITES
+%%%****************************************************************************
+
+%%%-------------------------------------------------------------------------#9-
+%%%
+%%% Macros reduce the boilerplate, i.e. save you a lot of typing and increase
+%%% speed of pinpointing an error by adding line numbers to the output auto-
+%%% matically. They also add a string representation of your source to a
+%%% possible error message. Take a look at erlunit.hrl to check them out.
+%%%
+%%% E.g. ?ERLUNIT_EQUAL(F, R) is the same as if you wrote
+%%% erlunit:equal(fun() -> F end, R, "Expect F == R", ?MODULE, ?LINE)).
+%%%
+%%% To use macros, you have to include the header erlunit.hrl in your source,
+%%% like so:
+%%% - include("erlunit.hrl").
+%%%
+%%%----------------------------------------------------------------------------
+
+sample9() ->
+
+	erlunit:strong_banner("Demonstration of Macros"),
+	
+	erlunit:start(),
+
+	erlunit:suite("#1"),
+	?ERLUNIT_EQUAL(1, 1.0),
+	?ERLUNIT_EXACT(1, 1),
+	?ERLUNIT_PASS(1 / 1),
+
+	erlunit:suite("#2"),
+	?ERLUNIT_FAIL(1 / zero()),
+
+	erlunit:execute().
+
+
+	% --- That's it. A complete test program. Run with 
+	% --- # erl
+	% --- 1> c(erlunit), c(sample), sample:sample9().
+
 
 %%%****************************************************************************
 %%% #10 MORE STRUCTURED SAMPLE - SUITES
@@ -362,6 +404,7 @@ run() ->
 	sample3(),
 	sample4(),
 	sample5(),
+	sample9(),
 	sample10().
 
 

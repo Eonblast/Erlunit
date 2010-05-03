@@ -2,7 +2,7 @@
 %%% File        : testtest.erl
 %%% Description : Test of test functions in erlunit.erl
 %%% Type        : Internal, for development of Erlunit
-%%% Version     : 0.2.4/alpha
+%%% Version     : 0.2.5/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - http://www.opensource.org/licenses/mit-license.php 
@@ -37,7 +37,7 @@
 
 -module(testtest).
 
--vsn("0.2.4/alpha").
+-vsn("0.2.5/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -52,7 +52,7 @@
 
 %-export([one/0]).
 
--define(VERSION, "0.2.4/alpha").
+-define(VERSION, "0.2.5/alpha").
 -define(PROGRAM, "Test-Test").
 
 %%%****************************************************************************
@@ -112,7 +112,7 @@ suite_minimal_msg() ->
 
 %%%
 %%%----------------------------------------------------------------------------
-%%% #2: same as above, with names for individual checks
+%%% #3: all types of checks
 %%%----------------------------------------------------------------------------
 %%%
 
@@ -147,6 +147,9 @@ suite_complete() ->
 	erlunit:equal(1, 1),
 	erlunit:equal(a, a),
 	erlunit:equal("a", "a"),
+	erlunit:exact(1, 1),
+	erlunit:exact(a, a),
+	erlunit:exact("a", "a"),
 	erlunit:not_equal(1, 0),
 	erlunit:not_equal(1, true),
 	erlunit:not_equal(1, false),
@@ -160,6 +163,7 @@ suite_complete() ->
 	% equality (with functions)
 	% -------------------------------
 	erlunit:equal(fun() -> 1 end, 1),
+	erlunit:exact(fun() -> 1 end, 1),
 	erlunit:not_equal(fun() -> 1 end, 0),
 	erlunit:bigger(2, fun() -> 1 end),
 	erlunit:lesser(fun() -> 1 end, 2),
@@ -228,6 +232,9 @@ suite_complete_inverted() ->
 	erlunit:equal(1, 0),
 	erlunit:equal(1, true),
 	erlunit:equal(1, false),
+	erlunit:exact(1, 1.0),  % =:= -> not -> pass as inverted.
+	erlunit:exact(1, true),
+	erlunit:exact(1, false),
 	erlunit:lesser(2, 1),
 	erlunit:lesser(a, 1),
 	erlunit:lesser(self(), a),
@@ -240,6 +247,7 @@ suite_complete_inverted() ->
 	% (inverted)
 	erlunit:not_equal(fun() -> 1 end, 1),
 	erlunit:equal(fun() -> 1 end, 0),
+	erlunit:exact(fun() -> 1 end, 0),
 	erlunit:lesser(2, fun() -> 1 end),
 	erlunit:bigger(fun() -> 1 end, 2),
 
@@ -298,6 +306,9 @@ suite_complete_verbose() ->
 	erlunit:equal(1, 1, "1=1 Equality"),
 	erlunit:equal(a, a, "Atom Equality"),
 	erlunit:equal("a", "a", "String Equality"),
+	erlunit:exact(1, 1, "1=1 Exact Equality"),
+	erlunit:exact(a, a, "Atom Exact Equality"),
+	erlunit:exact("a", "a", "String Exact Equality"),
 	erlunit:not_equal(1, 0, "Numberic Non-Equality"),
 	erlunit:not_equal(1, true, "Type Inequality"),
 	erlunit:not_equal(1, false, "Type Inequality"),
@@ -311,6 +322,7 @@ suite_complete_verbose() ->
 	% equality (with functions)
 	% -------------------------------
 	erlunit:equal(fun() -> 1 end, 1, "1=1 Equality, w/function"),
+	erlunit:exact(fun() -> 1 end, 1, "1=1 Exact Equality, w/function"),
 	erlunit:not_equal(fun() -> 1 end, 0, "1=0 Inequality, w/function"),
 	erlunit:bigger(2, fun() -> 1 end, "2>1, w/function"),
 	erlunit:lesser(fun() -> 1 end, 2, "1<2, w/function"),
@@ -366,6 +378,9 @@ suite_complete_verbose_mp() ->
 	Suite ! { equal, 1, 1, "1=1 Equality" },
 	Suite ! { equal, a, a, "Atom Equality" },
 	Suite ! { equal, "a", "a", "String Equality" },
+	Suite ! { exact, 1, 1, "1=1 Exact Equality" },
+	Suite ! { exact, a, a, "Atom Exact Equality" },
+	Suite ! { exact, "a", "a", "String Exact Equality" },
 	Suite ! { not_equal, 1, 0, "Numberic Non-Equality" },
 	Suite ! { not_equal, 1, true, "Type Inequality" },
 	Suite ! { not_equal, 1, false, "Type Inequality" },
@@ -379,6 +394,7 @@ suite_complete_verbose_mp() ->
 	% equality (with functions)
 	% -------------------------------
 	Suite ! { equal, fun() -> 1 end, 1, "1=1 Equality, w/function" },
+	Suite ! { exact, fun() -> 1 end, 1, "1=1 Exact Equality, w/function" },
 	Suite ! { not_equal, fun() -> 1 end, 0, "1=0 Inequality, w/function" },
 	Suite ! { bigger, 2, fun() -> 1 end, "2>1, w/function" },
 	Suite ! { lesser, fun() -> 1 end, 2, "1<2, w/function" },
@@ -433,6 +449,9 @@ suite_complete_mp() ->
 	Suite ! { equal, 1, 1 },
 	Suite ! { equal, a, a },
 	Suite ! { equal, "a", "a" },
+	Suite ! { exact, 1, 1 },
+	Suite ! { exact, a, a },
+	Suite ! { exact, "a", "a" },
 	Suite ! { not_equal, 1, 0 },
 	Suite ! { not_equal, 1, true },
 	Suite ! { not_equal, 1, false },
@@ -446,6 +465,7 @@ suite_complete_mp() ->
 	% equality (with functions)
 	% -------------------------------
 	Suite ! { equal, fun() -> 1 end, 1 },
+	Suite ! { exact, fun() -> 1 end, 1 },
 	Suite ! { not_equal, fun() -> 1 end, 0 },
 	Suite ! { bigger, 2, fun() -> 1 end },
 	Suite ! { lesser, fun() -> 1 end, 2 },
@@ -510,6 +530,14 @@ suite_first_macros() ->
 	?ERLUNIT_EQUAL_MSG(1, 1, "One is One"),
 	?ERLUNIT_EQUAL_MSG(0, 0, "Zero is Zero"),
 	
+	?ERLUNIT_EXACT(true, true),
+	?ERLUNIT_EXACT(1, 1),
+	?ERLUNIT_EXACT(0, 0),
+	
+	?ERLUNIT_EXACT_MSG(true, true, "True is True"),
+	?ERLUNIT_EXACT_MSG(1, 1, "One is One"),
+	?ERLUNIT_EXACT_MSG(0, 0, "Zero is Zero"),
+	
 	?ERLUNIT_FAIL(1 / zero()),
 	?ERLUNIT_FAIL(exit(sic)),
 	?ERLUNIT_FAIL(throw(sic)),
@@ -517,6 +545,14 @@ suite_first_macros() ->
 	?ERLUNIT_FAIL_MSG(1 / zero(), "Error: One By Zero"),
 	?ERLUNIT_FAIL_MSG(exit(sic), "Exit"),
 	?ERLUNIT_FAIL_MSG(throw(sic), "Throw"),
+
+	?ERLUNIT_PASS(1 / 1),
+	?ERLUNIT_PASS(_A = a),
+	?ERLUNIT_PASS(0 < b),
+
+	?ERLUNIT_PASS_MSG(1 / 1, "One by One"),
+	?ERLUNIT_PASS_MSG(_A = a, "A Can Become a"),
+	?ERLUNIT_PASS_MSG(0 < b, "A Number Is Smaller Than an Atom"),
 
 	ok.
 
@@ -542,13 +578,13 @@ suite_first_macros_inverted() ->
 	?ERLUNIT_EQUAL_MSG(0, nil, "Zero is Nil"),
 	
 	% expected to crash, which will in this inverted suite count as pass:
-	?ERLUNIT_EQUAL(1 / zero(), anything),
-	?ERLUNIT_EQUAL(exit(sic), anything), 
-	?ERLUNIT_EQUAL(throw(sic), anything),
+	?ERLUNIT_PASS(1 / zero()),
+	?ERLUNIT_PASS(exit(sic)), 
+	?ERLUNIT_PASS(throw(sic)),
 
-	?ERLUNIT_EQUAL_MSG(1 / zero(), anything, "One By Zero"),
-	?ERLUNIT_EQUAL_MSG(exit(sic), anything, "Exit"),
-	?ERLUNIT_EQUAL_MSG(throw(sic), anything, "Throw"),
+	?ERLUNIT_PASS_MSG(1 / zero(), "One By Zero"),
+	?ERLUNIT_PASS_MSG(exit(sic), "Exit"),
+	?ERLUNIT_PASS_MSG(throw(sic), "Throw"),
 
 	ok.
 

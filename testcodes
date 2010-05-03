@@ -1,0 +1,4 @@
+#!/usr/bin/env escript
+-compile(export_all).
+main([]) ->
+    io:format("\e[1;36mabc\e[0;37m").

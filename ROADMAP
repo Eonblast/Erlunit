@@ -1,4 +1,4 @@
-Erlunit 0.2.4/alpha - ROADMAP
+Erlunit 0.2.5/alpha - ROADMAP
 
 
 Mail hd2010@eonblast.com with requests. No promisses:
@@ -17,6 +17,8 @@ Mail hd2010@eonblast.com with requests. No promisses:
     - suppress the default suite's dump
     
     - suite count
+    
+    - percentile
 
 0.5 - make sense of suite concurrency
 

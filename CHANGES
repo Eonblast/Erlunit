@@ -1,16 +1,22 @@
-Erlunit 0.2.4/alpha - CHANGES
+Erlunit 0.2.5/alpha - CHANGES
 
-0.2.4   01 May 2010
+0.2.5   03 May 2010 - Exact Equality -
 
-		+ unregister sub processes correctly at restart after crash 
-		+ added first macros, header erlunit.hrl
-		+ added bash scripts quick, sample, test
+        + added exact comparison of numbers (1 =/= 1.0)
+        + added macros for pass and exact. 
+
+
+0.2.4   01 May 2010 - First Macros - 
+
+        + unregister sub processes correctly at restart after crash 
+        + added first macros, header erlunit.hrl
+        + added bash scripts quick, sample, test
 
 
 0.2.3   29 Apr 2010 - Hardened - 9c59d35d0bb1824584fe	
 
         +  wrapped any Fun parameter in any check in try/catch.
-		
+
 
 0.2.2   24 Apr 2010 - Docs Added - be587f1b1ef2664a2f6edde72c5cdd060f0bb634
 

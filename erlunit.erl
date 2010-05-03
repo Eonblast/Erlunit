@@ -1,13 +1,13 @@
 %%%----------------------------------------------------------------------------
 %%% File        : erlunit.erl
 %%% Description : Test functions
-%%% Version     : 0.2.4/alpha
+%%% Version     : 0.2.5/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - see below 
 %%% Author      : H. Diedrich <hd2010@eonblast.com>
 %%% Created     : 18 Apr 2010
-%%% Changed     : 22 Apr 2010 - see CHANGES
+%%% Changed     : 03 May 2010 - see CHANGES
 %%% Tested on   : Erlang R13B01
 %%%----------------------------------------------------------------------------
 %%%
@@ -36,6 +36,8 @@
 %%% This bit is dedicated to Joe, who had me smile now and then reading
 %%% his book Programming Erlang. Thanks, Joe! You are the man.
 %%%
+%%% Thanks to Stefan Marr.
+%%%
 %%%----------------------------------------------------------------------------
 % 
 % Copyright (c) 2010 Eonblast Corporation http://www.eonblast.com
@@ -61,7 +63,7 @@
 %%%----------------------------------------------------------------------------
 
 -module(erlunit).
--vsn("0.2.4/alpha").
+-vsn("0.2.5/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -72,12 +74,12 @@
 -export([suite/1, suite/2]).
 -export([true/1, not_true/1, false/1, not_false/1, pass/1, fail/1]).
 -export([true/2, not_true/2, false/2, not_false/2, pass/2, fail/2]).
--export([fail/4]).
+-export([pass/4, fail/4]).
 -export([exits/1, throws/1, error/1]).
 -export([exits/2, throws/2, error/2]).
--export([equal/2, not_equal/2, bigger/2, lesser/2]).
--export([equal/3, not_equal/3, bigger/3, lesser/3]).
--export([equal/5]).
+-export([exact/2, equal/2, not_equal/2, bigger/2, lesser/2]).
+-export([exact/3, equal/3, not_equal/3, bigger/3, lesser/3]).
+-export([exact/5, equal/5]).
 
 -export([echo/1, echo/2]).
 -export([banner/0, banner/1, strong_banner/1, strong_banner/2, center/2]).
@@ -88,10 +90,11 @@
 
 %%%----------------------------------------------------------------------------
 
--define(VERSION, "0.2.4/alpha").
+-define(VERSION, "0.2.5/alpha").
 -define(LIBRARY, "Erlunit").
 -define(COPYRIGHT, "(c) 2010 Eonblast Corporation http://www.eonblast.com").
 
+% -define(PROMPT, "\e[1;30merlunit:\e[0m ").
 -define(PROMPT, "erlunit: ").
 -define(INDENT, "         ").
 
@@ -215,18 +218,22 @@ pass(Fun) when is_function(Fun) -> pass(Fun, pass(msg)).
 
 pass(Fun, Message) when is_function(Fun) -> pass(whereis(suite), Fun, Message).
 
-pass(Suite, Fun, Message) when is_function(Fun) ->
+pass(Suite, Fun, Message) when is_function(Fun) -> pass(Suite, Fun, Message, "", "").
+
+pass(Fun, Message, Module, Line) when is_function(Fun) -> pass(whereis(suite), Fun, Message, Module, Line).
+
+pass(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
 
     try 
     	Fun(),
     	passed(Suite, Message, "passes ok")
 	catch
-    	throw:_Term -> 
-    		failed(Suite, Message, "throws exception but should pass ok");
-    	exit:_Reason -> 
-    		failed(Suite, Message, "make exit but should pass ok");
-    	error:_Reason -> 
-    		failed(Suite, Message, "runs into error but should pass ok")
+    	throw:Term -> 
+    		failed(Suite, Message, "throws exception (~p) but should pass ok | ~p  ~p", [Term, Module, Line]);
+    	exit:Reason -> 
+    		failed(Suite, Message, "make exit (~p) but should pass ok | ~p  ~p", [Reason, Module, Line]);
+    	error:Reason -> 
+    		failed(Suite, Message, "runs into error (~p) but should pass ok | ~p  ~p", [Reason, Module, Line])
 	end.
 
 %%%                                                                      checks
@@ -251,12 +258,12 @@ fail(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
     	Result = Fun(),
     	failed(Suite, Message, "passes ok (~p) but should fail | ~p  ~p", [Result, Module, Line])
 	catch
-    	throw:_Term -> 
-    		passed(Suite, Message, "throws exception, failing as it should");
-    	exit:_Reason -> 
-    		passed(Suite, Message, "makes exit, failing as it should");
-    	error:_Reason -> 
-    		passed(Suite, Message, "runs into error, failing as it should")
+    	throw:Term -> 
+    		passed(Suite, Message, "throws exception (~p), failing as it should", [Term]);
+    	exit:Reason -> 
+    		passed(Suite, Message, "makes exit (~p), failing as it should", [Reason]);
+    	error:Reason -> 
+    		passed(Suite, Message, "runs into error (~p), failing as it should", [Reason])
 	end.
 
 %%%                                                                      checks
@@ -361,6 +368,37 @@ equal(Suite, A, B, Message, Module, Line) when is_pid(Suite) ->
 			passed(Suite, Message, "~p as it should", [AA]);
          true ->
          	failed(Suite, Message, "~p /= ~p but should be equal | ~w ~w", [AA, BB, Module, Line])
+    end
+  catch _:_ -> nil  
+  end.
+  
+%%%                                                                      checks
+%%%----------------------------------------------------------------------------
+%%% exact
+%%%----------------------------------------------------------------------------
+%%%
+
+exact(msg) -> "Exact Equality check".
+
+exact(A, B) -> exact(A, B, exact(msg)).
+
+exact(A, B, Message) -> exact(whereis(suite), A, B, Message).
+
+exact(Suite, A, B, Message) when is_pid(Suite) -> exact(Suite, A, B, Message, "", "").
+
+exact(A, B, Message, Module, Line) -> exact(whereis(suite), A, B, Message, Module, Line).
+
+exact(Suite, A, B, Message, Module, Line) when is_pid(Suite) -> 
+
+  try
+	AA = payload(Suite, Message, A),
+	BB = payload(Suite, Message, B),
+
+    if 
+         AA =:= BB ->
+			passed(Suite, Message, "~p as it should", [AA]);
+         true ->
+         	failed(Suite, Message, "~p /= ~p but should be exact | ~w ~w", [AA, BB, Module, Line])
     end
   catch _:_ -> nil  
   end.
@@ -768,6 +806,17 @@ suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed) ->
 			equal(self(), A, B, Message),
 			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
 
+		%% check: exact                                                   suite
+		%% --------------------------------------------------------------------
+
+		{ exact, A, B } ->
+			exact(self(), A, B, exact(msg)),
+			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+
+		{ exact, A, B, Message } ->
+			exact(self(), A, B, Message),
+			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+
 		%% check: not_equal                                               suite
 		%% --------------------------------------------------------------------
 
@@ -867,7 +916,6 @@ inversion(Flags, Signal) when is_list(Flags), is_atom(Signal) ->
 %%% Stats Process
 %%%----------------------------------------------------------------------------
 
-
 stats(Nom) ->
 
 	stats_loop(Nom, 0, 0, 0).
@@ -917,7 +965,6 @@ stats_loop(Nom, Passed, Failed, Crashed) ->
 %%% Create Global List
 %%%----------------------------------------------------------------------------
 
-
 glist(AtomName) ->
 
 	GList = spawn(fun() -> glist_loop() end),
@@ -928,7 +975,6 @@ glist(AtomName) ->
 %%%----------------------------------------------------------------------------
 %%% Main Loop
 %%%----------------------------------------------------------------------------
-
 
 glist_loop() -> glist_loop([], nil, nil).
 

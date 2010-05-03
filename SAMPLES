@@ -1,4 +1,4 @@
-Erlunit 0.2.4/alpha - SAMPLES
+Erlunit 0.2.5/alpha - SAMPLES
 
 Read about samples in sample.erl. It is written to be read top down.
 
@@ -119,14 +119,14 @@ erlunit: + ok | Suite #2: Non-equality check | 1 /= 4 as it should.
 erlunit: + ok | Suite #1: Equality check | 5 as it should.
 erlunit: + ok | Suite #2: Non-equality check | 1 /= 5 as it should.
 erlunit: + ok | Suite #1: Equality check | 6 as it should.
-erlunit: + ok | Suite #2: Non-equality check | 1 /= 6 as it should.
 erlunit: + ok | Suite #1: Equality check | 7 as it should.
-erlunit: + ok | Suite #2: Non-equality check | 1 /= 7 as it should.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 6 as it should.
 erlunit: + ok | Suite #1: Equality check | 8 as it should.
-erlunit: + ok | Suite #2: Non-equality check | 1 /= 8 as it should.
 erlunit: + ok | Suite #1: Equality check | 9 as it should.
-erlunit: + ok | Suite #2: Non-equality check | 1 /= 9 as it should.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 7 as it should.
 erlunit: + ok | Suite #1: Equality check | 10 as it should.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 8 as it should.
+erlunit: + ok | Suite #2: Non-equality check | 1 /= 9 as it should.
 erlunit: + ok | Suite #2: Non-equality check | 1 /= 10 as it should.
 erlunit: ------------------------------------------------------------------
 erlunit: + OK | Suite #1: all 9 tests passed.
@@ -136,6 +136,31 @@ erlunit: + OK | Suite #2: all 9 tests passed.
 erlunit: ------------------------------------------------------------------
 erlunit: oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 erlunit: All passed - Tests: 18, Passed: 18, Failed: 0, Crashes: 0
+erlunit: oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+--o---------------------------------------------------------------------o--
+***************************************************************************
+                          Demonstration of Macros
+***************************************************************************
+------------------------------------------------------------------------o--
+---ooo-ooo--o--o--o-o--o-o-ooo------------------------------------------o--
+---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
+---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
+------------------------------------------------------------------------o--
+Erlunit 0.2.4/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+------------------------------------------------------------------------o--
+erlunit: Start of Tests.
+erlunit: + ok | Suite #1: Expect 1 == 1.0 | 1 as it should.
+erlunit: + ok | Suite #1: Expect 1 == 1 | 1 as it should.
+erlunit: + ok | Suite #1: 1 / 1 | passes ok.
+erlunit: + ok | Suite #2: 1 / zero ( ) | runs into error (badarith), failing as it should.
+erlunit: ------------------------------------------------------------------
+erlunit: + OK | Suite #1: all 3 tests passed.
+erlunit: ------------------------------------------------------------------
+erlunit: ------------------------------------------------------------------
+erlunit: + OK | Suite #2: all 1 tests passed.
+erlunit: ------------------------------------------------------------------
+erlunit: oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+erlunit: All passed - Tests: 4, Passed: 4, Failed: 0, Crashes: 0
 erlunit: oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 --o---------------------------------------------------------------------o--
 ***************************************************************************
@@ -151,7 +176,7 @@ Erlunit 0.2.4/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
 erlunit: Start of Tests.
 erlunit: + ok | Suite #1/Simple: Check for true | evaluates to true.
 erlunit: + ok | Suite #1/Simple: Equality check | 1 as it should.
-erlunit: + ok | Suite #1/Simple: Check for exception | runs into error, failing as it should.
+erlunit: + ok | Suite #1/Simple: Check for exception | runs into error (badarith), failing as it should.
 erlunit: Suite #2 gives names to individual checks
 erlunit: + ok | Suite #2/Simple (verbose): One Equals One | evaluates to true.
 erlunit: + ok | Suite #2/Simple (verbose): One Equals Zero | evaluates to false.
@@ -162,7 +187,7 @@ erlunit: + ok | Suite #2/Simple (verbose): Bar Is Not False | evaluates to bar, 
 erlunit: + ok | Suite #2/Simple (verbose): Once More Equality | 1 as it should.
 erlunit: + ok | Suite #2/Simple (verbose): And Non-Equality | 1 /= 0 as it should.
 erlunit: + ok | Suite #2/Simple (verbose): Trivial Fun | passes ok.
-erlunit: + ok | Suite #2/Simple (verbose): Div By Zero | runs into error, failing as it should.
+erlunit: + ok | Suite #2/Simple (verbose): Div By Zero | runs into error (badarith), failing as it should.
 erlunit: ------------------------------------------------------------------
 erlunit: + OK | Suite #1/Simple: all 3 tests passed.
 erlunit: ------------------------------------------------------------------
