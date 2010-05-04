@@ -4,7 +4,8 @@ Erlunit 0.2.5/alpha - CHANGES
 
         + added exact comparison of numbers (1 =/= 1.0)
         + added macros for pass and exact. 
-
+        + extended result lines by exception reasons
+        + added some colorizing of output (erlunit:start([colors]))
 
 0.2.4   01 May 2010 - First Macros - 
 

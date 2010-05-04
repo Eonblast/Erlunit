@@ -70,7 +70,7 @@
 
 %%%----------------------------------------------------------------------------
 
--export([start/0, execute/0, stats/1]).
+-export([start/0, start/1, execute/0, stats/2]).
 -export([suite/1, suite/2]).
 -export([true/1, not_true/1, false/1, not_false/1, pass/1, fail/1]).
 -export([true/2, not_true/2, false/2, not_false/2, pass/2, fail/2]).
@@ -504,9 +504,16 @@ failed(Suite, Message, Result) -> failed(Suite, Message, Result, []).
 
 failed(Suite, Message, Result, ResultParameter) ->
 
+	  	% colorizing
+	  	Options = get(options),
+	  	case lists:member(colors,Options) of
+	  		true -> Red = "\e[1;31m", UnRed = "\e[0m"; 
+	  		false -> Red = "", UnRed = ""
+	  	end,
+
 		SuiteName = glist_get(suitenames, Suite, ""),
-		io:format(?PROMPT ++ "FAIL | ##### ~s~s ~s | " ++ Result ++ ". #####~n",
-			[SuiteName, iff(SuiteName,":",""), Message | ResultParameter]),
+		io:format(?PROMPT ++ "FAIL | ##### ~s~s ~s~s~s | " ++ Result ++ ". #####~n",
+			[SuiteName, iff(SuiteName,":",""), Red, Message, UnRed | ResultParameter]),
 		Suite ! failed.
 
 
@@ -521,14 +528,18 @@ failed(Suite, Message, Result, ResultParameter) ->
 %%% Start                                                                 main
 %%%----------------------------------------------------------------------------
 
-start() ->
+start() -> start([]).
+
+start(Options) when is_list(Options) ->
 
 	banner(),
 
 	echo("Start of Tests."),
 	register(main, self()),
 
-	Stats = spawn(fun() -> stats("All") end),
+	put(options, Options),
+
+	Stats = spawn(fun() -> stats("Overall", Options) end),
 	force_register(stats, Stats),
 
 	glist(suitenames), % mind you, before first suite() call.
@@ -916,13 +927,13 @@ inversion(Flags, Signal) when is_list(Flags), is_atom(Signal) ->
 %%% Stats Process
 %%%----------------------------------------------------------------------------
 
-stats(Nom) ->
+stats(Nom, Options) ->
 
-	stats_loop(Nom, 0, 0, 0).
+	stats_loop(Nom, 0, 0, 0, Options).
 
-stats_loop(Nom, Passed, Failed, Crashed) ->
+stats_loop(Nom, Passed, Failed, Crashed, Options) ->
 	
-	% io:format("~nEntering stats_loop: ~s ~p ~p ~p ~n", [Nom, Passed, Failed, Crashed]),
+	% io:format("~nEntering stats_loop: ~s ~p ~p ~p ~p~n", [Nom, Passed, Failed, Crashed, Options]),
 	
 	receive
 	
@@ -930,28 +941,41 @@ stats_loop(Nom, Passed, Failed, Crashed) ->
 		%	stats_loop(Nom, Passed, Failed, Crashed);
 
 		passed -> 
-			stats_loop(Nom, Passed +1, Failed, Crashed);
+			stats_loop(Nom, Passed +1, Failed, Crashed, Options);
 
 		failed -> 
-			stats_loop(Nom, Passed, Failed +1, Crashed);
+			stats_loop(Nom, Passed, Failed +1, Crashed, Options);
 
 		crashed -> 
-			stats_loop(Nom, Passed, Failed +1, Crashed +1);
+			stats_loop(Nom, Passed, Failed +1, Crashed +1, Options);
 
 		print ->
+		  
+		  	% colorizing
+		  	case lists:member(colors,Options) of
+		  		true -> 
+		  			Red = "\e[1;31m", UnRed = "\e[0m",
+		  			Green = "\e[1;32m", UnGreen = "\e[0m"; 
+		  		false -> 
+		  			Red = "", UnRed = "",
+		  			Green = "", UnGreen = ""
+		  	end,
+		
 			if
 				Failed > 0 -> 
-					{ Verdict, Line } = { "failed", line(bad) };
+					{ Verdict, Line } = { "failed", line(bad) },
+					Color = "", UnColor = "", Hi = Red, UnHi = UnRed;
 				true -> 
-					{ Verdict, Line } = { "passed", line(splendid) }
+					{ Verdict, Line } = { "passed", line(splendid) },
+					Color = Green, UnColor = UnGreen, Hi = "", UnHi = ""
 			end,
 
-			echo("~s~n~s ~s - Tests: ~p, Passed: ~p, Failed: ~p, Crashes: ~p~n~s",
-				 [Line, Nom, Verdict, Passed+Failed, Passed, Failed, Crashed, Line]),
+			echo("~s~n~s~s~s ~s~s~s - Tests: ~p, Passed: ~p, Failed: ~s~p~s, Crashes: ~p~n~s",
+				 [Line, Color, Hi, Nom, Verdict, UnColor, UnHi, Passed+Failed, Passed, Hi, Failed, UnHi, Crashed, Line]),
 
 			io:format("--o---------------------------------------------------------------------o--~n"),
 
-			stats_loop(Nom, Passed, Failed, Crashed)
+			stats_loop(Nom, Passed, Failed, Crashed, Options)
 
     end.
 
@@ -1083,10 +1107,10 @@ payload(Suite, Message, Fun) when is_function(Fun) ->
     	Fun()
 	catch
     	throw:Term -> 
-    		failed(Suite, Message, "throws exception but should pass ok"),
+    		failed(Suite, Message, "throws exception (~p) but should pass ok, [Term]"),
     		throw(Term);
     	exit:Reason -> 
-    		failed(Suite, Message, "makes exit but should pass ok"),
+    		failed(Suite, Message, "makes exit (~p) but should pass ok", [Reason]),
     		throw(Reason);
     	error:Reason -> 
     		failed(Suite, Message, "runs into error (~p) but should pass ok", [Reason]),

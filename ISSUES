@@ -1,5 +1,5 @@
 Erlunit 0.2.5/alpha - ISSUES
 
-- none listed -
+001 Lost test counts when failed() throws an actual program error.
 
 Also see ROADMAP
