@@ -1,4 +1,4 @@
-Erlunit 0.2.6/alpha - ISSUES
+Erlunit 0.2.7/alpha - ISSUES
 
 001 Lost test counts when failed() throws an actual program error.
 

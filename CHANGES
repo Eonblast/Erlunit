@@ -1,6 +1,10 @@
-Erlunit 0.2.6/alpha - CHANGES
+Erlunit 0.2.7/alpha - CHANGES
 
-0.2.6   10 May 2010 - Macros Complete -
+0.2.7   10 May 2010 - Macro Doc
+
+		+ added documentation on macros in manual
+
+0.2.6   09 May 2010 - Macros Complete, Hardened Suites - 89b78962d84257f3997e
 
 		+ added remaining macros and their function variations for:
 		  true, not_true, false, not_false, not_equal, bigger, lesser,
@@ -10,14 +14,14 @@ Erlunit 0.2.6/alpha - CHANGES
         + fixed colors for message passing style
                 
 		
-0.2.5   03 May 2010 - Exact Equality -
+0.2.5   03 May 2010 - Exact Equality - 5f2526c5d7dcb4eba220
 
         + added exact comparison of numbers (1 =/= 1.0)
         + added macros for pass and exact. 
         + extended result lines by exception reasons
         + added some colorizing of output (erlunit:start([colors]))
 
-0.2.4   01 May 2010 - First Macros - 
+0.2.4   01 May 2010 - First Macros - 0bbc472a23d303b66ac3
 
         + unregister sub processes correctly at restart after crash 
         + added first macros, header erlunit.hrl

@@ -1,7 +1,7 @@
 %%%----------------------------------------------------------------------------
 %%% File        : sample.erl
 %%% Description : Sample usage of test functions in erlunit.erl
-%%% Version     : 0.2.6/alpha
+%%% Version     : 0.2.7/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - http://www.opensource.org/licenses/mit-license.php 
@@ -66,7 +66,7 @@
 
 -module(sample).
 
--vsn("0.2.6/alpha").
+-vsn("0.2.7/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -81,7 +81,7 @@
 
 -compile({nowarn_unused_function, [banner/1]}).
 
--define(VERSION, "0.2.6/alpha").
+-define(VERSION, "0.2.7/alpha").
 -define(PROGRAM, "Test Samples").
 
 %%%****************************************************************************

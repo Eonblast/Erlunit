@@ -1,4 +1,4 @@
-Erlunit 0.2.6/alpha - MANUAL
+Erlunit 0.2.7/alpha - MANUAL
 
 ----------------------------------------------------------------------------o--
 ---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
@@ -21,8 +21,10 @@ Copyright (c) 2010 Eonblast Corporation http://www.eonblast.com
 
  Reference	
  * Tests
- * Suties
+ * Suites
  * Checks
+ * Macros
+ * All Checks and Macros
  
  Theory
  * Why would you use this?
@@ -76,6 +78,7 @@ Copyright (c) 2010 Eonblast Corporation http://www.eonblast.com
 
  * Take a look at sample.erl
 
+   It is written to be read top down, tutorial style. And you can run() it.
 
 ----------------------------------------------------------------------------o--
 ---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
@@ -477,7 +480,14 @@ These other files can be executed and inspected:
 
 	 Imperative                    - or -            Message Passing
 	 -------------------------                       ------------------------ 
-	 erlunit:<name>([<suite>, ] <param> [,<Descr>])     [<test or suite>] ! { <name>, <param> [, Descr] }
+	 erlunit:<name>([<suite>, ] <param> [,<Descr>])  [<test or suite>] ! { <name>, <param> [, Descr] }
+	
+     - or -
+     
+     Imperative Macros             
+	 -------------------------                      
+	 ?ERLUNIT_<name>([<suite>, ] <param> [,<Descr>])
+	                               
 	
 	[ ] here is to mean 'optional', not 'Erlang list'.
 	
@@ -499,49 +509,110 @@ These other files can be executed and inspected:
 	<test or suite> are either a test process or a suite process, which are
 		            returned by start() and suite() respectively.
 
+== Macros ==
 	
+     Macros add a stringified text of: A, module and code line for the output.
+     For example ?ERLUNIT_TRUE(a == a) is translated into something like:
+     erlunit:true(fun() -> a == a end, "a == a", "sample.erl", 510 )).
+     
+
+     Macros MUST NOT get a Fun as argument, they wrap every expression A into a
+     Fun themselves. Where a check like erlunit:pass() needs a Fun as argument, 
+     Macros gets only the inner expression A of a Fun fun() -> A end.
+     
+     Include erlunit.hrl in your source to use macros. They are defined like so:
+     -define(ERLUNIT_TRUE(A), erlunit:true(fun() -> A end, ??A, ?MODULE, ?LINE )).
+
+
+== All Checks and Macros ==	
 	
 	The complete list of checks:
 	
-	 Imperative                    - or -            Message Passing
-	 -------------------------                       ------------------------ 
-	 * erlunit:true(A)                               Test ! { true, A }
-	 * erlunit:false(A)                              Test ! { false, A } 
-	 * erlunit:equal(A, B)                           Test ! { equal, A, B }
-	 * erlunit:bigger(A, B)                          Test ! { bigger, A, B }
-	 * erlunit:lesser(A, B)                          Test ! { lesser, A, B }
+	 Imperative                    - or -          Message Passing
+	 -------------------------                     ------------------------ 
+	 erlunit:true(A)                               Test ! { true, A }
+	 erlunit:false(A)                              Test ! { false, A } 
+	 erlunit:equal(A, B)                           Test ! { equal, A, B }
+	 erlunit:bigger(A, B)                          Test ! { bigger, A, B }
+	 erlunit:lesser(A, B)                          Test ! { lesser, A, B }
 	
-	 * erlunit:pass(Fun)                             Test ! { pass, Fun }
-	 * erlunit:fail(Fun)                             Test ! { fail, Fun }
-	 * erlunit:throws(Fun)                           Test ! { throws, Fun }
-	 * erlunit:error(Fun)                            Test ! { error, Fun }
-	 * erlunit:exits(Fun)                            Test ! { exits, Fun }
+	 erlunit:pass(Fun)                             Test ! { pass, Fun }
+	 erlunit:fail(Fun)                             Test ! { fail, Fun }
+	 erlunit:throws(Fun)                           Test ! { throws, Fun }
+	 erlunit:error(Fun)                            Test ! { error, Fun }
+	 erlunit:exits(Fun)                            Test ! { exits, Fun }
 	
-	 * erlunit:not_true(A)                           Test ! { not_true, A }
-	 * erlunit:not_false(A)                          Test ! { not_false, A } 
-	 * erlunit:not_equal(A, B)                       Test ! { not_equal, A, B }
+	 erlunit:not_true(A)                           Test ! { not_true, A }
+	 erlunit:not_false(A)                          Test ! { not_false, A } 
+	 erlunit:not_equal(A, B)                       Test ! { not_equal, A, B }
 	
+
+
+     Macros MUST NOT get a Fun, they wrap every expression A into a Fun themselves.
+     They are using the inner expression A of a Fun (fun() -> A end) of above:
+     
+     Include erlunit.hrl to use macros. They are defined like this:
+     -define(ERLUNIT_TRUE(A), erlunit:true(fun() -> A end, ??A, ?MODULE, ?LINE )).
+     This adds a stringified text of: A, module and code line for the output.
+
+	 Imperative Macros              
+	 -------------------------     
+	 ?ERLUNIT_TRUE(A)       
+	 ?ERLUNIT_FALSE(A)       
+	 ?ERLUNIT_EQUAL(A, B)
+	 ?ERLUNIT_BIGGER(A, B)
+	 ?ERLUNIT_LESSER(A, B)
 	
-	They can all take an optional description text as last parameter:
+	 ?ERLUNIT_PASS(A)          % A, not Fun 
+	 ?ERLUNIT_FAIL(A)          % 
+	 ?ERLUNIT_THROWS(A)        %
+	 ?ERLUNIT_ERROR(A)         %
+	 ?ERLUNIT_EXITS(A)         %
 	
-	 Imperative                    - or -            Message Passing
-	 -------------------------                       ------------------------ 
-	 * erlunit:true(A)                               Test ! { true, A }
-	 * erlunit:false(A)                              Test ! { false, A } 
-	 * erlunit:equal(A, B)                           Test ! { equal, A, B }
-	 * erlunit:bigger(A, B)                          Test ! { bigger, A, B }
-	 * erlunit:lesser(A, B)                          Test ! { lesser, A, B }
+	 ?ERLUNIT_NOT_TRUE(A) 
+	 ?ERLUNIT_NOT_FALSE(A)
+	 ?ERLUNIT_NOT_EQUAL(A, B)
 	
-	 * erlunit:pass(Fun)                             Test ! { pass, Fun }
-	 * erlunit:fail(Fun)                             Test ! { fail, Fun }
-	 * erlunit:throws(Fun)                           Test ! { throws, Fun }
-	 * erlunit:error(Fun)                            Test ! { error, Fun }
-	 * erlunit:exits(Fun)                            Test ! { exits, Fun }
+
+	 They can all take an optional description text as last parameter:
 	
-	 * erlunit:not_true(A)                           Test ! { not_true, A }
-	 * erlunit:not_false(A)                          Test ! { not_false, A } 
-	 * erlunit:not_equal(A, B)                       Test ! { not_equal, A, B }
+	 Imperative                    - or -          Message Passing
+	 -------------------------                     ------------------------ 
+	 erlunit:true(A)                               Test ! { true, A }
+	 erlunit:false(A)                              Test ! { false, A } 
+	 erlunit:equal(A, B)                           Test ! { equal, A, B }
+	 erlunit:bigger(A, B)                          Test ! { bigger, A, B }
+	 erlunit:lesser(A, B)                          Test ! { lesser, A, B }
+	
+	 erlunit:pass(Fun)                             Test ! { pass, Fun }
+	 erlunit:fail(Fun)                             Test ! { fail, Fun }
+	 erlunit:throws(Fun)                           Test ! { throws, Fun }
+	 erlunit:error(Fun)                            Test ! { error, Fun }
+	 erlunit:exits(Fun)                            Test ! { exits, Fun }
+	
+	 erlunit:not_true(A)                           Test ! { not_true, A }
+	 erlunit:not_false(A)                          Test ! { not_false, A } 
+	 erlunit:not_equal(A, B)                       Test ! { not_equal, A, B }
     
+    Macros add _MSG:
+    
+	 Imperative Macros              
+	 -------------------------     
+	 ?ERLUNIT_TRUE_MSG(A, MSG)       
+	 ?ERLUNIT_FALSE_MSG(A, MSG)       
+	 ?ERLUNIT_EQUAL_MSG(A, B, MSG)
+	 ?ERLUNIT_BIGGER_MSG(A, B, MSG)
+	 ?ERLUNIT_LESSER_MSG(A, B, MSG)
+	
+	 ?ERLUNIT_PASS_MSG(A, MSG)   
+	 ?ERLUNIT_FAIL_MSG(A, MSG)   
+	 ?ERLUNIT_THROWS_MSG(A, MSG) 
+	 ?ERLUNIT_ERROR_MSG(A, MSG)  
+	 ?ERLUNIT_EXITS_MSG(A, MSG)  
+	
+	 ?ERLUNIT_NOT_TRUE_MSG(A, MSG) 
+	 ?ERLUNIT_NOT_FALSE_MSG(A, MSG)
+	 ?ERLUNIT_NOT_EQUAL_MSG(A, B, MSG)
 
 
     All checks accept a Suite that they belong to, as shown below. This
@@ -549,23 +620,23 @@ These other files can be executed and inspected:
     check is sorted into the last created suite. If no suite was created, they
     are automatically in an internal default suite.	
 
-	 Imperative                    - or -            Message Passing
-	 -------------------------                       ------------------------ 
-	 * erlunit:true(Suite, A)                        Suite ! { true, A }
-	 * erlunit:false(Suite, A)                       Suite ! { false, A } 
-	 * erlunit:equal(Suite, A, B)                    Suite ! { equal, A, B }
-	 * erlunit:bigger(Suite, A, B)                   Suite ! { bigger, A, B }
-	 * erlunit:lesser(Suite, A, B)                   Suite ! { lesser, A, B }
+	 Imperative                    - or -          Message Passing
+	 -------------------------                     ------------------------ 
+	 erlunit:true(Suite, A)                        Suite ! { true, A }
+	 erlunit:false(Suite, A)                       Suite ! { false, A } 
+	 erlunit:equal(Suite, A, B)                    Suite ! { equal, A, B }
+	 erlunit:bigger(Suite, A, B)                   Suite ! { bigger, A, B }
+	 erlunit:lesser(Suite, A, B)                   Suite ! { lesser, A, B }
 	
-	 * erlunit:pass(Suite, Fun)                      Suite ! { pass, Fun }
-	 * erlunit:fail(Suite, Fun)                      Suite ! { fail, Fun }
-	 * erlunit:throws(Suite, Fun)                    Suite ! { throws, Fun }
-	 * erlunit:error(Suite, Fun)                     Suite ! { error, Fun }
-	 * erlunit:exits(Suite, Fun)                     Suite ! { exits, Fun }
+	 erlunit:pass(Suite, Fun)                      Suite ! { pass, Fun }
+	 erlunit:fail(Suite, Fun)                      Suite ! { fail, Fun }
+	 erlunit:throws(Suite, Fun)                    Suite ! { throws, Fun }
+	 erlunit:error(Suite, Fun)                     Suite ! { error, Fun }
+	 erlunit:exits(Suite, Fun)                     Suite ! { exits, Fun }
 	
-	 * erlunit:not_true(Suite, A)                    Suite ! { not_true, A }
-	 * erlunit:not_false(Suite, A)                   Suite ! { not_false, A } 
-	 * erlunit:not_equal(Suite, A, B)                Suite ! { not_equal, A, B }
+	 erlunit:not_true(Suite, A)                    Suite ! { not_true, A }
+	 erlunit:not_false(Suite, A)                   Suite ! { not_false, A } 
+	 erlunit:not_equal(Suite, A, B)                Suite ! { not_equal, A, B }
 
 
 ----------------------------------------------------------------------------o--
@@ -704,7 +775,7 @@ THE SOFTWARE.
  File        : MANUAL
  Description : Description of Erlunit
  Type        : Documentation
- Version     : 0.2.6/alpha
+ Version     : 0.2.7/alpha
  Status      : alpha
  Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
  License     : MIT - see above 

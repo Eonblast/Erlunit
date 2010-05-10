@@ -1,4 +1,4 @@
-Erlunit 0.2.6/alpha - SAMPLES
+Erlunit 0.2.7/alpha - SAMPLES
 
 Read about samples in sample.erl. It is written to be read top down.
 
@@ -25,7 +25,7 @@ $ erl
 ---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
 ---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
 ------------------------------------------------------------------------o--
-Erlunit 0.2.6/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+Erlunit 0.2.7/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
 ------------------------------------------------------------------------o--
 erlunit: Start of Tests.
 erlunit: + ok | Equality check
@@ -45,7 +45,7 @@ erlunit: oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 ---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
 ---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
 ------------------------------------------------------------------------o--
-Erlunit 0.2.6/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+Erlunit 0.2.7/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
 ------------------------------------------------------------------------o--
 erlunit: Start of Tests.
 erlunit: + ok | Equality check
@@ -65,7 +65,7 @@ erlunit: oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 ---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
 ---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
 ------------------------------------------------------------------------o--
-Erlunit 0.2.6/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+Erlunit 0.2.7/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
 ------------------------------------------------------------------------o--
 erlunit: Start of Tests.
 erlunit: + ok | Suite #1: Equality check
@@ -90,7 +90,7 @@ erlunit: oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 ---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
 ---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
 ------------------------------------------------------------------------o--
-Erlunit 0.2.6/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+Erlunit 0.2.7/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
 ------------------------------------------------------------------------o--
 erlunit: Start of Tests.
 erlunit: + ok | Suite #1: Equality check
@@ -121,7 +121,7 @@ erlunit: Suites will run concurrently and their output will *interleave*!
 ---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
 ---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
 ------------------------------------------------------------------------o--
-Erlunit 0.2.6/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+Erlunit 0.2.7/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
 ------------------------------------------------------------------------o--
 erlunit: Start of Tests.
 erlunit: + ok | Suite #1: Check for true
@@ -178,7 +178,7 @@ erlunit: oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 ---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
 ---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
 ------------------------------------------------------------------------o--
-Erlunit 0.2.6/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+Erlunit 0.2.7/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
 ------------------------------------------------------------------------o--
 erlunit: Start of Tests.
 erlunit: + ok | Suite #1: Expect 1 == 1.0
@@ -207,7 +207,7 @@ erlunit: oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 ---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--
 ---Ooo-O--O-Ooo-OO--O-oO-O--O-------------------------------------------o--
 ------------------------------------------------------------------------o--
-Erlunit 0.2.6/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
+Erlunit 0.2.7/alpha (c) 2010 Eonblast Corporation http://www.eonblast.com
 ------------------------------------------------------------------------o--
 erlunit: Start of Tests.
 erlunit: + ok | Suite #1/Simple: Check for true

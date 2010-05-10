@@ -2,7 +2,7 @@
 %%% File        : testtest.erl
 %%% Description : Test of test functions in erlunit.erl
 %%% Type        : Internal, for development of Erlunit
-%%% Version     : 0.2.6/alpha
+%%% Version     : 0.2.7/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - http://www.opensource.org/licenses/mit-license.php 
@@ -12,10 +12,10 @@
 %%% Tested on   : Erlang R13B01
 %%%----------------------------------------------------------------------------
 %%%
-%%% This program is for development of Erlunit, it tests the Erlunit functions.
+%%% This program is for development of Erlunit, it tests the test functions.
 %%%
 %%% It's not part of what is needed to use Erlunit. It is not a regular Erlunit
-%%% test either, it breaks somewhat less controlled.
+%%% test either, it can break somewhat less controlled.
 %%% 
 %%% To learn about Erlunit, read sample.erl
 %%% 
@@ -37,7 +37,7 @@
 
 -module(testtest).
 
--vsn("0.2.6/alpha").
+-vsn("0.2.7/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -52,7 +52,7 @@
 
 %-export([one/0]).
 
--define(VERSION, "0.2.6/alpha").
+-define(VERSION, "0.2.7/alpha").
 -define(PROGRAM, "Test-Test").
 
 %%%****************************************************************************
@@ -830,4 +830,4 @@ center_indent(Text, Width) ->
 %%%----------------------------------------------------------------------------
 %%%
 %%% The actual test functions are in erlunit.erl
-%%% View online at http://github.com/hdiedrich/erlunit/blob/master/erlunit.erl
+%%% View online at http://github.com/Eonblast/Erlunit/blob/master/erlunit.erl

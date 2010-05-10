@@ -1,7 +1,7 @@
 %%%----------------------------------------------------------------------------
 %%% File        : erlunit.erl
 %%% Description : Test functions
-%%% Version     : 0.2.6/alpha
+%%% Version     : 0.2.7/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - see below 
@@ -63,7 +63,7 @@
 %%%----------------------------------------------------------------------------
 
 -module(erlunit).
--vsn("0.2.6/alpha").
+-vsn("0.2.7/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -93,7 +93,7 @@
 
 %%%----------------------------------------------------------------------------
 
--define(VERSION, "0.2.6/alpha").
+-define(VERSION, "0.2.7/alpha").
 -define(LIBRARY, "Erlunit").
 -define(COPYRIGHT, "(c) 2010 Eonblast Corporation http://www.eonblast.com").
 
@@ -122,7 +122,9 @@
 %%%****************************************************************************
 %%%                                                                      
 %%% This is repetive to avoid the hiding of details coming with macro use and
-%%% more complicated function calls that anonymous function would entail.  
+%%% more complicated function calls that anonymous function would entail.
+%%%
+%%% These function can be called by the main process or a suite process. 
 %%%                                                                      
 %%%---------------------------------------------------------------------checks-
 %%% true - check if an expression returns true
@@ -527,6 +529,8 @@ lesser(Suite, A, B, Message, Module, Line) when is_pid(Suite) ->
 %%% COUNTER CALLS
 %%%****************************************************************************
 %%%
+%%% These function can be called by the main process or a suite process. 
+%%%                                                                      
 %%%----------------------------------------------------------------------------
 %%% passed - echo positive result and count it
 %%%----------------------------------------------------------------------------
