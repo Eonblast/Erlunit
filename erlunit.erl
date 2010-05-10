@@ -1,13 +1,13 @@
 %%%----------------------------------------------------------------------------
 %%% File        : erlunit.erl
 %%% Description : Test functions
-%%% Version     : 0.2.5/alpha
+%%% Version     : 0.2.6/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - see below 
 %%% Author      : H. Diedrich <hd2010@eonblast.com>
 %%% Created     : 18 Apr 2010
-%%% Changed     : 03 May 2010 - see CHANGES
+%%% Changed     : 10 May 2010 - see CHANGES
 %%% Tested on   : Erlang R13B01
 %%%----------------------------------------------------------------------------
 %%%
@@ -15,11 +15,11 @@
 %%%
 %%% Usage, see sample.erl. Basically -
 %%%
-%%%    either:                   or:  
-%%%	   erlunit:start()       |   Test = erlunit:start(),
-%%%    erlunit:equal(1, 1),  |   Test ! { equal, 1, 1 },
-%%%    ...  				 |   ...
-%%%	   erlunit:execute().    |   erlunit:execute().
+%%%    either:                  or:                         or:
+%%%	   erlunit:start()      |   Test = erlunit:start(),  |  erlunit:start()
+%%%    erlunit:equal(1, 1), |   Test ! { equal, 1, 1 },  |  ?ERLUNIT_EQUAL(1,1),
+%%%    ...  				|   ...                      |  ...
+%%%	   erlunit:execute().   |   erlunit:execute().       |  erlunit:execute().
 %%%
 %%% There are also suites, names for tests and concurrent execution.
 %%%
@@ -36,7 +36,7 @@
 %%% This bit is dedicated to Joe, who had me smile now and then reading
 %%% his book Programming Erlang. Thanks, Joe! You are the man.
 %%%
-%%% Thanks to Stefan Marr.
+%%% Thanks to Stefan Marr, Fred Hebert and Richard O'Keefe.
 %%%
 %%%----------------------------------------------------------------------------
 % 
@@ -52,18 +52,18 @@
 % The above copyright notice, including link, and this permission notice shall 
 % be included in all copies or substantial portions of the Software.
 % 
-% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-% IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-% AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+% THE SOFTWARE IS PROVIDED "AS IS",  WITHOUT WARRANTY  OF ANY KIND, EXPRESS OR
+% IMPLIED,  INCLUDING BUT NOT LIMITED TO  THE  WARRANTIES  OF  MERCHANTABILITY,
+% FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+% AUTHORS  OR  COPYRIGHT  HOLDER  BE LIABLE  FOR  ANY CLAIM,  DAMAGES OR OTHER
 % LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR  THE USE  OR  OTHER DEALINGS IN
 % THE SOFTWARE.
 % 
 %%%----------------------------------------------------------------------------
 
 -module(erlunit).
--vsn("0.2.5/alpha").
+-vsn("0.2.6/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -74,12 +74,15 @@
 -export([suite/1, suite/2]).
 -export([true/1, not_true/1, false/1, not_false/1, pass/1, fail/1]).
 -export([true/2, not_true/2, false/2, not_false/2, pass/2, fail/2]).
--export([pass/4, fail/4]).
+-export([true/3, not_true/3, false/3, not_false/3, pass/3, fail/3]).
+-export([true/4, not_true/4, false/4, not_false/4, pass/4, fail/4]).
 -export([exits/1, throws/1, error/1]).
 -export([exits/2, throws/2, error/2]).
+-export([exits/3, throws/3, error/3]).
+-export([exits/4, throws/4, error/4]).
 -export([exact/2, equal/2, not_equal/2, bigger/2, lesser/2]).
 -export([exact/3, equal/3, not_equal/3, bigger/3, lesser/3]).
--export([exact/5, equal/5]).
+-export([exact/5, equal/5, not_equal/5, bigger/5, lesser/5]).
 
 -export([echo/1, echo/2]).
 -export([banner/0, banner/1, strong_banner/1, strong_banner/2, center/2]).
@@ -90,7 +93,7 @@
 
 %%%----------------------------------------------------------------------------
 
--define(VERSION, "0.2.5/alpha").
+-define(VERSION, "0.2.6/alpha").
 -define(LIBRARY, "Erlunit").
 -define(COPYRIGHT, "(c) 2010 Eonblast Corporation http://www.eonblast.com").
 
@@ -117,8 +120,11 @@
 %%%****************************************************************************
 %%% INDIVIDUAL CHECKS
 %%%****************************************************************************
-%%%                                                                      checks
-%%%----------------------------------------------------------------------------
+%%%                                                                      
+%%% This is repetive to avoid the hiding of details coming with macro use and
+%%% more complicated function calls that anonymous function would entail.  
+%%%                                                                      
+%%%---------------------------------------------------------------------checks-
 %%% true - check if an expression returns true
 %%%----------------------------------------------------------------------------
 %%%
@@ -130,14 +136,18 @@ true(A) -> true(A, true(msg)).
 
 true(A, Message) -> true(whereis(suite), A, Message).
 
-true(Suite, A, Message) ->
+true(Suite, A, Message) when is_pid(Suite) -> true(Suite, A, Message, "", "").
+
+true(A, Message, Module, Line) -> true(whereis(suite), A, Message, Module, Line).
+
+true(Suite, A, Message, Module, Line) when is_pid(Suite) ->
 
 		AA = payload(Suite, Message, A),
 	
 		if  AA ->
-				passed(Suite, Message, "evaluates to ~p", [AA]);
+				passed(Suite, Message, "evaluates to ~w", [AA]);
 	    	true ->
-				failed(Suite, Message, "evaluates to ~p, should be true but is not", [AA])
+				failed(Suite, Message, "evaluates to ~w, should be true but is not | ~w ~w", [AA, Module, Line])
 		end.
 
 %%%                                                                      checks
@@ -152,14 +162,18 @@ not_true(A) -> not_true(A, not_true(msg)).
 
 not_true(A, Message) -> not_true(whereis(suite), A, Message).
 
-not_true(Suite, A, Message) ->
+not_true(Suite, A, Message) when is_pid(Suite) -> not_true(Suite, A, Message, "", "").
+
+not_true(A, Message, Module, Line) -> not_true(whereis(suite), A, Message, Module, Line).
+
+not_true(Suite, A, Message, Module, Line) when is_pid(Suite) ->
 
 	AA = payload(Suite, Message, A),
 
     if AA =/= true ->
-			passed(Suite, Message, "evaluates to ~p, not true, as it should", [AA]);
+			passed(Suite, Message, "evaluates to ~w, not true, as it should", [AA]);
        true ->
-			failed(Suite, Message, "evaluates to ~p, but should not be true", [AA])
+			failed(Suite, Message, "evaluates to ~w, but should not be true | ~w ~w", [AA, Module, Line])
        end.
        
 %%%                                                                      checks
@@ -174,14 +188,18 @@ false(A) -> false(A, false(msg)).
 
 false(A, Message) -> false(whereis(suite), A, Message).
 
-false(Suite, A, Message) ->
+false(Suite, A, Message) when is_pid(Suite) -> false(Suite, A, Message, "", "").
+
+false(A, Message, Module, Line) -> false(whereis(suite), A, Message, Module, Line).
+
+false(Suite, A, Message, Module, Line) when is_pid(Suite) ->
 
 	AA = payload(Suite, Message, A),
 
     if AA == false ->
-			passed(Suite, Message, "evaluates to ~p", [AA]);
+			passed(Suite, Message, "evaluates to ~w", [AA]);
        true ->
-			failed(Suite, Message, "evaluates to ~p, should be false but is not", [AA])
+			failed(Suite, Message, "evaluates to ~w, should be false but is not | ~w ~w", [AA, Module, Line])
        end.
 
 %%%                                                                      checks
@@ -190,20 +208,25 @@ false(Suite, A, Message) ->
 %%%----------------------------------------------------------------------------
 %%%
 
+
 not_false(msg) -> "Check for not false";
 
 not_false(A) -> not_false(A, not_false(msg)).
 
 not_false(A, Message) -> not_false(whereis(suite), A, Message).
 
-not_false(Suite, A, Message) ->
+not_false(Suite, A, Message) when is_pid(Suite) -> not_false(Suite, A, Message, "", "").
+
+not_false(A, Message, Module, Line) -> not_false(whereis(suite), A, Message, Module, Line).
+
+not_false(Suite, A, Message, Module, Line) when is_pid(Suite) ->
 
 	AA = payload(Suite, Message, A),
 
     if AA =/= false ->
-			passed(Suite, Message, "evaluates to ~p, not false, as it should", [AA]);
+			passed(Suite, Message, "evaluates to ~w, not false, as it should", [AA]);
        true ->
-			failed(Suite, Message, "evaluates to ~p, but should not be false", [AA])
+			failed(Suite, Message, "evaluates to ~w, but should not be false | ~w ~w", [AA, Module, Line])
        end.
 
 %%%                                                                      checks
@@ -229,11 +252,11 @@ pass(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
     	passed(Suite, Message, "passes ok")
 	catch
     	throw:Term -> 
-    		failed(Suite, Message, "throws exception (~p) but should pass ok | ~p  ~p", [Term, Module, Line]);
+    		failed(Suite, Message, "throws exception (~w) but should pass ok | ~w  ~w", [Term, Module, Line]);
     	exit:Reason -> 
-    		failed(Suite, Message, "make exit (~p) but should pass ok | ~p  ~p", [Reason, Module, Line]);
+    		failed(Suite, Message, "make exit (~w) but should pass ok | ~w  ~w", [Reason, Module, Line]);
     	error:Reason -> 
-    		failed(Suite, Message, "runs into error (~p) but should pass ok | ~p  ~p", [Reason, Module, Line])
+    		failed(Suite, Message, "runs into error (~w) but should pass ok | ~w  ~w", [Reason, Module, Line])
 	end.
 
 %%%                                                                      checks
@@ -256,14 +279,14 @@ fail(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
 
     try 
     	Result = Fun(),
-    	failed(Suite, Message, "passes ok (~p) but should fail | ~p  ~p", [Result, Module, Line])
+    	failed(Suite, Message, "passes ok (~w) but should fail | ~w  ~w", [Result, Module, Line])
 	catch
     	throw:Term -> 
-    		passed(Suite, Message, "throws exception (~p), failing as it should", [Term]);
+    		passed(Suite, Message, "throws exception (~w), failing as it should", [Term]);
     	exit:Reason -> 
-    		passed(Suite, Message, "makes exit (~p), failing as it should", [Reason]);
+    		passed(Suite, Message, "makes exit (~w), failing as it should", [Reason]);
     	error:Reason -> 
-    		passed(Suite, Message, "runs into error (~p), failing as it should", [Reason])
+    		passed(Suite, Message, "runs into error (~w), failing as it should", [Reason])
 	end.
 
 %%%                                                                      checks
@@ -272,24 +295,29 @@ fail(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
 %%%----------------------------------------------------------------------------
 %%%
 
+
 throws(msg) -> "Check for throw";
 
 throws(Fun) when is_function(Fun) -> throws(Fun, throws(msg)).
 
 throws(Fun, Message) when is_function(Fun) -> throws(whereis(suite), Fun, Message).
 
-throws(Suite, Fun, Message) when is_function(Fun) ->
+throws(Suite, Fun, Message) when is_function(Fun) -> throws(Suite, Fun, Message, "", "").
+
+throws(Fun, Message, Module, Line) when is_function(Fun) -> throws(whereis(suite), Fun, Message, Module, Line).
+
+throws(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
 
     try 
     	Fun(),
-    	failed(Suite, Message, "passes ok but should throw and fail")
+    	failed(Suite, Message, "passes ok but should throw and fail | ~w ~w", [Module, Line])
 	catch
     	throw:_Term -> 
     		passed(Suite, Message, "throws exception, as it should");
     	exit:_Reason -> 
-    		failed(Suite, Message, "makes exit, but should throw and and fail");
+    		failed(Suite, Message, "makes exit, but should throw and and fail | ~w ~w", [Module,Line]);
     	error:_Reason -> 
-    		failed(Suite, Message, "runs into error, but should throw and fail")
+    		failed(Suite, Message, "runs into error, but should throw and fail | ~w ~w", [Module,Line])
 	end.
 %%%                                                                      checks
 %%%----------------------------------------------------------------------------
@@ -297,24 +325,28 @@ throws(Suite, Fun, Message) when is_function(Fun) ->
 %%%----------------------------------------------------------------------------
 %%%
 
-exits(msg) -> "Check for exit to be called";
+exits(msg) -> "Check for exit being called";
 
 exits(Fun) when is_function(Fun) -> exits(Fun, exits(msg)).
 
 exits(Fun, Message) when is_function(Fun) -> exits(whereis(suite), Fun, Message).
 
-exits(Suite, Fun, Message) when is_function(Fun) ->
+exits(Suite, Fun, Message) when is_function(Fun) -> exits(Suite, Fun, Message, "", "").
+
+exits(Fun, Message, Module, Line) when is_function(Fun) -> exits(whereis(suite), Fun, Message, Module, Line).
+
+exits(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
 
     try 
     	Fun(),
-    	failed(Suite, Message, "passes ok but should throw and fail")
+    	failed(Suite, Message, "passes ok but should throw and fail | ~w ~w", [Module,Line])
 	catch
     	throw:_Term -> 
-    		failed(Suite, Message, "throws exception, as it should");
+    		failed(Suite, Message, "throws exception, as it should | ~w ~w", [Module,Line]);
     	exit:_Reason -> 
     		passed(Suite, Message, "makes exit, but should throw and and fail");
     	error:_Reason -> 
-    		failed(Suite, Message, "runs into error, but should throw and fail")
+    		failed(Suite, Message, "runs into error, but should throw and fail | ~w ~w", [Module,Line])
 	end.
 %%%                                                                      checks
 %%%----------------------------------------------------------------------------
@@ -322,22 +354,26 @@ exits(Suite, Fun, Message) when is_function(Fun) ->
 %%%----------------------------------------------------------------------------
 %%%
 
-error(msg) -> "Check for error to take place";
+error(msg) -> "Check for having error";
 
 error(Fun) when is_function(Fun) -> error(Fun, error(msg)).
 
 error(Fun, Message) when is_function(Fun) -> error(whereis(suite), Fun, Message).
 
-error(Suite, Fun, Message) when is_function(Fun) ->
+error(Suite, Fun, Message) when is_function(Fun) -> error(Suite, Fun, Message, "", "").
+
+error(Fun, Message, Module, Line) when is_function(Fun) -> error(whereis(suite), Fun, Message, Module, Line).
+
+error(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
 
     try 
     	Fun(),
-    	failed(Suite, Message, "passes ok but should run into error")
+    	failed(Suite, Message, "passes ok but should run into error | ~w ~w", [Module, Line])
 	catch
     	throw:_Term -> 
-    		failed(Suite, Message, "throws exception, but should run into error");
+    		failed(Suite, Message, "throws exception, but should run into error | ~w ~w", [Module,Line]);
     	exit:_Reason -> 
-    		failed(Suite, Message, "makes exit, but should run into error");
+    		failed(Suite, Message, "makes exit, but should run into error | ~w ~w", [Module,Line]);
     	error:_Reason -> 
     		passed(Suite, Message, "runs into error, as it should")
 	end.
@@ -365,9 +401,9 @@ equal(Suite, A, B, Message, Module, Line) when is_pid(Suite) ->
 
     if 
          AA == BB ->
-			passed(Suite, Message, "~p as it should", [AA]);
+			passed(Suite, Message, "~w as it should", [AA]);
          true ->
-         	failed(Suite, Message, "~p /= ~p but should be equal | ~w ~w", [AA, BB, Module, Line])
+         	failed(Suite, Message, "~w /= ~w but should be equal | ~w ~w", [AA, BB, Module, Line])
     end
   catch _:_ -> nil  
   end.
@@ -396,9 +432,9 @@ exact(Suite, A, B, Message, Module, Line) when is_pid(Suite) ->
 
     if 
          AA =:= BB ->
-			passed(Suite, Message, "~p as it should", [AA]);
+			passed(Suite, Message, "~w as it should", [AA]);
          true ->
-         	failed(Suite, Message, "~p /= ~p but should be exact | ~w ~w", [AA, BB, Module, Line])
+         	failed(Suite, Message, "~w /= ~w but should be exact | ~w ~w", [AA, BB, Module, Line])
     end
   catch _:_ -> nil  
   end.
@@ -408,22 +444,27 @@ exact(Suite, A, B, Message, Module, Line) when is_pid(Suite) ->
 %%% not_equal
 %%%----------------------------------------------------------------------------
 
-not_equal(msg) -> "Non-equality check".
+
+not_equal(msg) -> "Non-Equality check".
 
 not_equal(A, B) -> not_equal(A, B, not_equal(msg)).
 
 not_equal(A, B, Message) -> not_equal(whereis(suite), A, B, Message).
 
-not_equal(Suite, A, B, Message) ->
+not_equal(Suite, A, B, Message) when is_pid(Suite) -> not_equal(Suite, A, B, Message, "", "").
+
+not_equal(A, B, Message, Module, Line) -> not_equal(whereis(suite), A, B, Message, Module, Line).
+
+not_equal(Suite, A, B, Message, Module, Line) when is_pid(Suite) -> 
 
 	AA = payload(Suite, Message, A),
 	BB = payload(Suite, Message, B),
 
     if 
          AA /= BB ->
-			passed(Suite, Message, "~p /= ~p as it should", [AA, BB]);
+			passed(Suite, Message, "~w /= ~w as it should", [AA, BB]);
          true ->
-         	failed(Suite, Message, "~p == ~p but should NOT be equal", [AA, BB])
+         	failed(Suite, Message, "~w == ~w but should NOT be equal | ~w ~w", [AA, BB, Module, Line])
        end.
 
 %%%                                                                      checks
@@ -432,22 +473,26 @@ not_equal(Suite, A, B, Message) ->
 %%%----------------------------------------------------------------------------
 %%%
 
-bigger(msg) -> "Check for bigger".
+bigger(msg) -> "Check if bigger".
 
 bigger(A, B) -> bigger(A, B, bigger(msg)).
 
 bigger(A, B, Message) -> bigger(whereis(suite), A, B, Message).
 
-bigger(Suite, A, B, Message) ->
+bigger(Suite, A, B, Message) when is_pid(Suite) -> bigger(Suite, A, B, Message, "", "").
+
+bigger(A, B, Message, Module, Line) -> bigger(whereis(suite), A, B, Message, Module, Line).
+
+bigger(Suite, A, B, Message, Module, Line) when is_pid(Suite) -> 
 
 	AA = payload(Suite, Message, A),
 	BB = payload(Suite, Message, B),
 
     if 
          AA > BB ->
-			passed(Suite, Message, "~p > ~p as it should", [A, B]);
+			passed(Suite, Message, "~w > ~w as it should", [A, B]);
          true ->
-         	failed(Suite, Message, "~p <= ~p but should be bigger", [A, B])
+         	failed(Suite, Message, "~w <= ~w but should be bigger | ~w ~w", [A, B, Module, Line])
        end.
 
 %%%                                                                      checks
@@ -456,22 +501,26 @@ bigger(Suite, A, B, Message) ->
 %%%----------------------------------------------------------------------------
 %%%
 
-lesser(msg) -> "Check for lesser".
+lesser(msg) -> "Non-Equality check".
 
 lesser(A, B) -> lesser(A, B, lesser(msg)).
 
 lesser(A, B, Message) -> lesser(whereis(suite), A, B, Message).
 
-lesser(Suite, A, B, Message) ->
+lesser(Suite, A, B, Message) when is_pid(Suite) -> lesser(Suite, A, B, Message, "", "").
+
+lesser(A, B, Message, Module, Line) -> lesser(whereis(suite), A, B, Message, Module, Line).
+
+lesser(Suite, A, B, Message, Module, Line) when is_pid(Suite) -> 
 
 	AA = payload(Suite, Message, A),
 	BB = payload(Suite, Message, B),
 
     if 
          AA < BB ->
-			passed(Suite, Message, "~p < ~p as it should", [A, B]);
+			passed(Suite, Message, "~w < ~w as it should", [A, B]);
          true ->
-         	failed(Suite, Message, "~p >= ~p but should be lesser", [A, B])
+         	failed(Suite, Message, "~w >= ~w but should be lesser | ~w ~w", [A, B, Module, Line])
        end.
 
 %%%****************************************************************************
@@ -487,12 +536,21 @@ passed(Suite, Message, Result) -> passed(Suite, Message, Result, []).
 
 passed(Suite, Message, Result, ResultParameter) ->
 
-		SuiteName = glist_get(suitenames, Suite, ""),
-		io:format(?PROMPT ++ "+ ok | ~s~s~s~s | " ++ Result ++ ".~n",
-			[SuiteName, iff(SuiteName,": ",""), 
-			"", % iff(length(SuiteName) > ((width()-15)*2), <<13,10,?INDENT,"     ` ">>,""),
-			 Message | ResultParameter]),
-		Suite ! passed.
+		Suite ! passed,
+
+	  	Options = get(options),
+
+	  	case lists:member(nopasses,Options) of
+	  		true -> nil;
+	  		false ->
+
+				SuiteName = glist_get(suitenames, Suite, ""),
+%				io:format(?PROMPT ++ "+ ok | ~s~s~s~s | " ++ Result ++ ".~n",
+				io:format(?PROMPT ++ "+ ok | ~s~s~s~s~n" ++ ?PROMPT ++ "     | --> " ++ Result ++ ".~n",
+					[SuiteName, iff(SuiteName,": ",""), 
+					"", % iff(length(SuiteName) > ((width()-15)*2), <<13,10,?INDENT,"     ` ">>,""),
+					 Message | ResultParameter])
+		end.
 
 
 %%%----------------------------------------------------------------------------
@@ -504,19 +562,53 @@ failed(Suite, Message, Result) -> failed(Suite, Message, Result, []).
 
 failed(Suite, Message, Result, ResultParameter) ->
 
-	  	% colorizing
+		Suite ! failed,
+
 	  	Options = get(options),
-	  	case lists:member(colors,Options) of
-	  		true -> Red = "\e[1;31m", UnRed = "\e[0m"; 
-	  		false -> Red = "", UnRed = ""
-	  	end,
 
-		SuiteName = glist_get(suitenames, Suite, ""),
-		io:format(?PROMPT ++ "FAIL | ##### ~s~s ~s~s~s | " ++ Result ++ ". #####~n",
-			[SuiteName, iff(SuiteName,":",""), Red, Message, UnRed | ResultParameter]),
-		Suite ! failed.
+	  	case lists:member(nofails,Options) of
+	  		true -> nil;
+	  		false ->
+	  			% colorizing
+			  	case lists:member(colors,Options) of
+	  				true -> Red = "\e[1;31m", UnRed = "\e[0m"; 
+	  				false -> Red = "", UnRed = ""
+	  			end,
+
+				SuiteName = glist_get(suitenames, Suite, ""),
+				io:format(?PROMPT ++ "FAIL | ##### ~s~s ~s~s~s | " ++ Result ++ ". #####~n",
+					[SuiteName, iff(SuiteName,":",""), Red, Message, UnRed | ResultParameter])
+		end.
 
 
+
+%%%----------------------------------------------------------------------------
+%%% crashed - echo negative result and count it
+%%%----------------------------------------------------------------------------
+
+
+crashed(Suite, Reason) ->
+
+%		Suite ! crashed,
+%
+%	  	Options = get(options),
+%
+%	  	case lists:member(nocrashes,Options) of
+%	  		true -> nil;
+%	  		false ->
+%	  			% colorizing
+%			  	case lists:member(colors,Options) of
+%	  				true -> Red = "\e[1;31m", UnRed = "\e[0m"; 
+%	  				false -> Red = "", UnRed = ""
+%	  			end,
+
+ 				Red = "\e[1;31m", UnRed = "\e[0m",
+
+				SuiteName = glist_get(suitenames, Suite, ""),
+				io:format(?PROMPT ++ "CRASH | XXXXX ~s~s ~s~w ~w~s XXXXX~n",
+					[SuiteName, iff(SuiteName,":",""), Red, Reason, erlang:get_stacktrace(), UnRed]).
+%		end.
+		
 %%%****************************************************************************
 %%% MAIN TEST
 %%%****************************************************************************
@@ -562,11 +654,11 @@ execute() ->
 
 execute_loop(Phase, SuitesActive, SuitesToPrint) ->
 
-	vecho(?D3, "Main process phase: ~p | active suites: ~p | to print: ~p", [Phase, SuitesActive, SuitesToPrint]),
+	vecho(?D3, "Main process phase: ~w | active suites: ~w | to print: ~w", [Phase, SuitesActive, SuitesToPrint]),
 
 	receive
 	Rcv ->
-	vecho(?D3, "Main process receives: ~p", [Rcv]),
+	vecho(?D3, "Main process receives: ~w", [Rcv]),
 	
 	case Rcv of
 	
@@ -633,7 +725,7 @@ execute_loop(Phase, SuitesActive, SuitesToPrint) ->
 			complete;
 
 		Any -> 
-			vecho(?D3, "Handed on from main process to suite: ~p~n", [Any]),
+			vecho(?D3, "Handed on from main process to suite: ~w~n", [Any]),
 			suite ! Any,
 			execute_loop(Phase, SuitesActive, SuitesToPrint)
 		end
@@ -663,7 +755,9 @@ suite(Nom, Flags) when is_list(Nom), is_list(Flags) ->
 		_ -> nil
 	end,
 	
-	Suite = spawn(fun() -> suite("Suite " ++ Nom, Flags, self()) end),
+	Options = get(options),
+		
+	Suite = spawn(fun() -> suite("Suite " ++ Nom, Flags, Options, self()) end),
 	
 	glist_add(suitenames, Suite, "Suite " ++ Nom), 
 	main ! { add, Suite, Nom },
@@ -672,240 +766,257 @@ suite(Nom, Flags) when is_list(Nom), is_list(Flags) ->
 	force_register(suite, Suite),
 	
 	Suite.
+
 %%%	                                                                     
 %%%----------------------------------------------------------------------------
 %%% Create Suite Process                                                 suite
 %%%----------------------------------------------------------------------------
 %%% non-exported: -------------------------------------------------------------
 	
-suite(Nom, Flags, Caller) ->
+suite(Nom, Flags, Caller) -> suite(Nom, Flags, [], Caller).
+
+suite(Nom, Flags, Options, Caller) ->
+
+
+	put(options, Options), % replicates main process options
 
 	suite_loop(Nom, Flags, Caller, nil, 0, 0, 0),
 	exit(1000).
 
 suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed) ->
 	
-	receive
-
-		%% counters                                                       suite
-		%% --------------------------------------------------------------------
-		%% Note that these counter calls are processed way later than
-		%% the check calls, because the latter are fielded, usually,
-		%% in fast succession, thus are queued first in line, before
-		%% even the first of them are executed, which then, in turn,
-		%% generate the below counter calls
-		
-		passed -> 
-			{ Signal, Pass, Fail } = inversion(Flags, passed),
-			stats ! Signal,
-			suite_loop(Nom, Flags, Caller, Sub, Passed + Pass, Failed + Fail, Crashed);
-		failed -> 
-			{ Signal, Pass, Fail } = inversion(Flags, failed),
-			stats ! Signal,
-			suite_loop(Nom, Flags, Caller, Sub, Passed + Pass, Failed + Fail, Crashed);
-		crashed -> 
-			stats ! crashed,
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed +1, Crashed +1);
-
-		%% check: true                                                    suite
-		%% --------------------------------------------------------------------
-
-		{ true, A } ->
-			true(self(), A, true(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ true, A, Message } ->
-			true(self(), A, Message ),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		%% check: not_true                                                suite
-		%% --------------------------------------------------------------------
-
-		{ not_true, A } ->
-			not_true(self(), A, not_true(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ not_true, A, Message } ->
-			not_true(self(), A, Message ),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		%% check: false                                                   suite
-		%% --------------------------------------------------------------------
-
-		{ false, A } ->
-			false(self(), A, false(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ false, A, Message } ->
-			false(self(), A, Message ),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		%% check: not_false                                               suite
-		%% --------------------------------------------------------------------
-
-		{ not_false, A } ->
-			not_false(self(), A, not_false(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ not_false, A, Message } ->
-			not_false(self(), A, Message ),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		%% check: pass                                                    suite
-		%% --------------------------------------------------------------------
-
-		{ pass, A } ->
-			pass(self(), A, pass(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ pass, A, Message } ->
-			pass(self(), A, Message ),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		%% check: fail                                                    suite
-		%% --------------------------------------------------------------------
-
-		{ fail, A } ->
-			fail(self(), A, fail(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ fail, A, Message } ->
-			fail(self(), A, Message ),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		%% check: throws                                                  suite
-		%% --------------------------------------------------------------------
-
-		{ throws, A } ->
-			throws(self(), A, throws(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ throws, A, Message } ->
-			throws(self(), A, Message ),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		%% check: error                                                  suite
-		%% --------------------------------------------------------------------
-
-		{ error, A } ->
-			error(self(), A, error(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ error, A, Message } ->
-			error(self(), A, Message ),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		%% check: exits                                                   suite
-		%% --------------------------------------------------------------------
-
-		{ exits, A } ->
-			exits(self(), A, exits(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ exits, A, Message } ->
-			exits(self(), A, Message ),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);		
-		
-		%% check: equal                                                   suite
-		%% --------------------------------------------------------------------
-
-		{ equal, A, B } ->
-			equal(self(), A, B, equal(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ equal, A, B, Message } ->
-			equal(self(), A, B, Message),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		%% check: exact                                                   suite
-		%% --------------------------------------------------------------------
-
-		{ exact, A, B } ->
-			exact(self(), A, B, exact(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ exact, A, B, Message } ->
-			exact(self(), A, B, Message),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		%% check: not_equal                                               suite
-		%% --------------------------------------------------------------------
-
-		{ not_equal, A, B } ->
-			not_equal(self(), A, B, not_equal(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ not_equal, A, B, Message } ->
-			not_equal(self(), A, B, Message),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		%% check: lesser                                                  suite
-		%% --------------------------------------------------------------------
-
-		{ lesser, A, B } ->
-			lesser(self(), A, B, lesser(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ lesser, A, B, Message } ->
-			lesser(self(), A, B, Message),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		%% check: bigger                                                  suite
-		%% --------------------------------------------------------------------
-
-		{ bigger, A, B } ->
-			bigger(self(), A, B, bigger(msg)),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		{ bigger, A, B, Message } ->
-			bigger(self(), A, B, Message),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
-
-		%% screen                                                         suite
-		%% --------------------------------------------------------------------
-		print -> 
-			if
-				% suppress printing the default suite when unused
-				(Nom == ?DEFAULT_SUITE_NAME) and (Passed+Failed+Crashed == 0) ->
-					nil;
-
-				true ->
-					if 
-						(Failed > 0) or (Crashed > 0) -> 
-							echo("~s~n~s failed - Tests: ~p, Failed: ~p, Crashes: ~p~n~s",
-								 [line(bad), Nom, Passed+Failed, Failed, Crashed, line(bad)]);
-						true -> 
-							echo("~s~n+ OK | ~s: all ~p tests passed.~n~s",
-								 [line(good), Nom, Passed, line(good)])
-					end
-		
-					% echo("~s~n~s ~s - Tests: ~p, Passed: ~p, Failed: ~p, Crashes: ~p~n~s",
-					%	 [Line, Nom, Verdict, Passed+Failed, Passed, Failed, Crashed, Line])
-			end,
-
-			main ! { printed, self() },
-
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+	try 
+		receive
+	
+			%% counters                                                       suite
+			%% --------------------------------------------------------------------
+			%% Note that these counter calls are processed way later than
+			%% the check calls, because the latter are fielded, usually,
+			%% in fast succession, thus are queued first in line, before
+			%% even the first of them are executed, which then, in turn,
+			%% generate the below counter calls
 			
-		%% control                                                        suite
-		%% --------------------------------------------------------------------
-		stop -> 
-			return;
+			passed -> 
+				{ Signal, Pass, Fail } = inversion(Flags, passed),
+				stats ! Signal,
+				suite_loop(Nom, Flags, Caller, Sub, Passed + Pass, Failed + Fail, Crashed);
+			failed -> 
+				{ Signal, Pass, Fail } = inversion(Flags, failed),
+				stats ! Signal,
+				suite_loop(Nom, Flags, Caller, Sub, Passed + Pass, Failed + Fail, Crashed);
+			crashed -> 
+				stats ! crashed,
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed +1, Crashed +1);
+				% doubled, see (***)
 
-		done -> 
-			% self() ! print,
-			main ! { done, self() },
-			vecho(?V1, "~s~n~s done.", [line(), Nom]),
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+			%% check: true                                                    suite
+			%% --------------------------------------------------------------------
+	
+			{ true, A } ->
+				true(self(), A, true(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ true, A, Message } ->
+				true(self(), A, Message ),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			%% check: not_true                                                suite
+			%% --------------------------------------------------------------------
+	
+			{ not_true, A } ->
+				not_true(self(), A, not_true(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ not_true, A, Message } ->
+				not_true(self(), A, Message ),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			%% check: false                                                   suite
+			%% --------------------------------------------------------------------
+	
+			{ false, A } ->
+				false(self(), A, false(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ false, A, Message } ->
+				false(self(), A, Message ),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			%% check: not_false                                               suite
+			%% --------------------------------------------------------------------
+	
+			{ not_false, A } ->
+				not_false(self(), A, not_false(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ not_false, A, Message } ->
+				not_false(self(), A, Message ),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			%% check: pass                                                    suite
+			%% --------------------------------------------------------------------
+	
+			{ pass, A } ->
+				pass(self(), A, pass(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ pass, A, Message } ->
+				pass(self(), A, Message ),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			%% check: fail                                                    suite
+			%% --------------------------------------------------------------------
+	
+			{ fail, A } ->
+				fail(self(), A, fail(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ fail, A, Message } ->
+				fail(self(), A, Message ),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			%% check: throws                                                  suite
+			%% --------------------------------------------------------------------
+	
+			{ throws, A } ->
+				throws(self(), A, throws(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ throws, A, Message } ->
+				throws(self(), A, Message ),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			%% check: error                                                  suite
+			%% --------------------------------------------------------------------
+	
+			{ error, A } ->
+				error(self(), A, error(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ error, A, Message } ->
+				error(self(), A, Message ),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			%% check: exits                                                   suite
+			%% --------------------------------------------------------------------
+	
+			{ exits, A } ->
+				exits(self(), A, exits(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ exits, A, Message } ->
+				exits(self(), A, Message ),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);		
 			
-		Malformed -> 
-			echo("###### ~s can't deal with ~p. ######~n###### ~s ######", [Nom, Malformed, ?USERR]),
-			self() ! crashed,
-			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed)
+			%% check: equal                                                   suite
+			%% --------------------------------------------------------------------
+	
+			{ equal, A, B } ->
+				equal(self(), A, B, equal(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ equal, A, B, Message } ->
+				equal(self(), A, B, Message),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			%% check: exact                                                   suite
+			%% --------------------------------------------------------------------
+	
+			{ exact, A, B } ->
+				exact(self(), A, B, exact(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ exact, A, B, Message } ->
+				exact(self(), A, B, Message),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			%% check: not_equal                                               suite
+			%% --------------------------------------------------------------------
+	
+			{ not_equal, A, B } ->
+				not_equal(self(), A, B, not_equal(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ not_equal, A, B, Message } ->
+				not_equal(self(), A, B, Message),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			%% check: lesser                                                  suite
+			%% --------------------------------------------------------------------
+	
+			{ lesser, A, B } ->
+				lesser(self(), A, B, lesser(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ lesser, A, B, Message } ->
+				lesser(self(), A, B, Message),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			%% check: bigger                                                  suite
+			%% --------------------------------------------------------------------
+	
+			{ bigger, A, B } ->
+				bigger(self(), A, B, bigger(msg)),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			{ bigger, A, B, Message } ->
+				bigger(self(), A, B, Message),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+	
+			%% screen                                                         suite
+			%% --------------------------------------------------------------------
+			print -> 
+				if
+					% suppress printing the default suite when unused
+					(Nom == ?DEFAULT_SUITE_NAME) and (Passed+Failed+Crashed == 0) ->
+						nil;
+	
+					true ->
+						if 
+							(Failed > 0) or (Crashed > 0) -> 
+								echo("~s~n~s failed - Tests: ~w, Failed: ~w, Crashes: ~w~n~s",
+									 [line(bad), Nom, Passed+Failed, Failed, Crashed, line(bad)]);
+							true -> 
+								echo("~s~n+ OK | ~s: all ~w tests passed.~n~s",
+									 [line(good), Nom, Passed, line(good)])
+						end
 			
-		after 1000 ->
-			exit("Suite " ++ Nom ++ " stalled. " ++ ?USERR)
-    end.
+						% echo("~s~n~s ~s - Tests: ~w, Passed: ~w, Failed: ~w, Crashes: ~w~n~s",
+						%	 [Line, Nom, Verdict, Passed+Failed, Passed, Failed, Crashed, Line])
+				end,
+	
+				main ! { printed, self() },
+	
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+				
+			%% control                                                        suite
+			%% --------------------------------------------------------------------
+			stop -> 
+				return;
+	
+			done -> 
+				% self() ! print,
+				main ! { done, self() },
+				vecho(?V1, "~s~n~s done.", [line(), Nom]),
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
+				
+			Malformed -> 
+				echo("###### ~s can't deal with ~w. ######~n###### ~s ######", [Nom, Malformed, ?USERR]),
+				self() ! crashed,
+				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed)
+				
+			after 1000 ->
+				exit("Suite " ++ Nom ++ " stalled. " ++ ?USERR)
+		end
+
+    catch
+    	error:Reason ->
+    		stats ! crashed,
+    		crashed(self(), Reason),	
+			suite_loop(Nom, Flags, Caller, Sub, Passed, Failed +1, Crashed +1)
+	end.
+
     
 %%%	                                                                     
 %%%----------------------------------------------------------------------------
@@ -933,11 +1044,11 @@ stats(Nom, Options) ->
 
 stats_loop(Nom, Passed, Failed, Crashed, Options) ->
 	
-	% io:format("~nEntering stats_loop: ~s ~p ~p ~p ~p~n", [Nom, Passed, Failed, Crashed, Options]),
+	% io:format("~nEntering stats_loop: ~s ~w ~w ~w ~w~n", [Nom, Passed, Failed, Crashed, Options]),
 	
 	receive
 	
-		% X -> io:format("Stats loop received ~p~n", [X]),
+		% X -> io:format("Stats loop received ~w~n", [X]),
 		%	stats_loop(Nom, Passed, Failed, Crashed);
 
 		passed -> 
@@ -970,7 +1081,7 @@ stats_loop(Nom, Passed, Failed, Crashed, Options) ->
 					Color = Green, UnColor = UnGreen, Hi = "", UnHi = ""
 			end,
 
-			echo("~s~n~s~s~s ~s~s~s - Tests: ~p, Passed: ~p, Failed: ~s~p~s, Crashes: ~p~n~s",
+			echo("~s~n~s~s~s ~s~s~s - Tests: ~w, Passed: ~w, Failed: ~s~w~s, Crashes: ~w~n~s",
 				 [Line, Color, Hi, Nom, Verdict, UnColor, UnHi, Passed+Failed, Passed, Hi, Failed, UnHi, Crashed, Line]),
 
 			io:format("--o---------------------------------------------------------------------o--~n"),
@@ -1006,7 +1117,7 @@ glist_loop(List, PrevCaller, Return) ->
 
 	% call back to originally caller, to deliver result.
 	if is_pid(PrevCaller) -> 
-		vecho(?D4, "call ~p ~p", [PrevCaller, Return]), 
+		vecho(?D4, "call ~w ~w", [PrevCaller, Return]), 
 		PrevCaller ! Return; 
 		true -> nil
 	 end,
@@ -1026,7 +1137,7 @@ glist_loop(List, PrevCaller, Return) ->
 
 glist_add(GList, Key, Contents) ->
 	
-	vecho(?D4, "glist_add: GList ~p | Key ~p | Contents ~p", [GList, Key, Contents]),
+	vecho(?D4, "glist_add: GList ~w | Key ~w | Contents ~w", [GList, Key, Contents]),
 
 	GList ! { add, { Key, Contents }, self() },
 	receive ok -> ok after 3000 -> exit("Urgh. Programmed to death. glist_add() stalled. " ++ ?USERR ++ " Try D4.") end.
@@ -1064,7 +1175,7 @@ glist_get(GList, Key, Default) when is_pid(Key) -> glist_get(GList, Key, Default
 
 glist_get(GList, Key, Default, Retry) -> 
 
-	vecho(?D4, "glist_get: GList ~p | Key ~p | Retry ~p", [GList, Key, Retry]),
+	vecho(?D4, "glist_get: GList ~w | Key ~w | Retry ~w", [GList, Key, Retry]),
 
 	case lists:member(GList, registered()) of
 		true ->
@@ -1107,13 +1218,13 @@ payload(Suite, Message, Fun) when is_function(Fun) ->
     	Fun()
 	catch
     	throw:Term -> 
-    		failed(Suite, Message, "throws exception (~p) but should pass ok, [Term]"),
+    		failed(Suite, Message, "throws exception (~w) but should pass ok, [Term]"),
     		throw(Term);
     	exit:Reason -> 
-    		failed(Suite, Message, "makes exit (~p) but should pass ok", [Reason]),
+    		failed(Suite, Message, "makes exit (~w) but should pass ok", [Reason]),
     		throw(Reason);
     	error:Reason -> 
-    		failed(Suite, Message, "runs into error (~p) but should pass ok", [Reason]),
+    		failed(Suite, Message, "runs into error (~w) but should pass ok", [Reason]),
     		throw(Reason)
 	end;
 

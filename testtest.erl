@@ -2,7 +2,7 @@
 %%% File        : testtest.erl
 %%% Description : Test of test functions in erlunit.erl
 %%% Type        : Internal, for development of Erlunit
-%%% Version     : 0.2.5/alpha
+%%% Version     : 0.2.6/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - http://www.opensource.org/licenses/mit-license.php 
@@ -37,7 +37,7 @@
 
 -module(testtest).
 
--vsn("0.2.5/alpha").
+-vsn("0.2.6/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -52,7 +52,7 @@
 
 %-export([one/0]).
 
--define(VERSION, "0.2.5/alpha").
+-define(VERSION, "0.2.6/alpha").
 -define(PROGRAM, "Test-Test").
 
 %%%****************************************************************************
@@ -76,8 +76,8 @@ run() ->
 	suite_complete_verbose_mp(),
 	suite_complete_mp(),
 
-	suite_first_macros(),
-	suite_first_macros_inverted(),
+	suite_macros(),
+	suite_macros_inverted(),
 
 	erlunit:execute().
 
@@ -513,31 +513,48 @@ suite_verbose() ->
 
 %%%
 %%%----------------------------------------------------------------------------
-%%% #8: first macros
+%%% #8: macros
 %%%----------------------------------------------------------------------------
 %%%
-%%% work in progress here.
 
-suite_first_macros() ->
+suite_macros() ->
 
-	erlunit:suite("#8 - first macros"),
+	erlunit:suite("#8 macros"),
 
-	?ERLUNIT_EQUAL(true, true),
-	?ERLUNIT_EQUAL(1, 1),
-	?ERLUNIT_EQUAL(0, 0),
-	
-	?ERLUNIT_EQUAL_MSG(true, true, "True is True"),
-	?ERLUNIT_EQUAL_MSG(1, 1, "One is One"),
-	?ERLUNIT_EQUAL_MSG(0, 0, "Zero is Zero"),
-	
-	?ERLUNIT_EXACT(true, true),
-	?ERLUNIT_EXACT(1, 1),
-	?ERLUNIT_EXACT(0, 0),
-	
-	?ERLUNIT_EXACT_MSG(true, true, "True is True"),
-	?ERLUNIT_EXACT_MSG(1, 1, "One is One"),
-	?ERLUNIT_EXACT_MSG(0, 0, "Zero is Zero"),
-	
+	?ERLUNIT_TRUE(1 == 1),
+	?ERLUNIT_TRUE(_A = true), % sic
+	?ERLUNIT_TRUE(0 < b),  % sic
+
+	?ERLUNIT_TRUE_MSG(1 == 1, "One equals One"),
+	?ERLUNIT_TRUE_MSG(_A = true, "A is assigned true"),
+	?ERLUNIT_TRUE_MSG(0 < b,  "A Number Is Smaller Than an Atom"),
+
+	?ERLUNIT_NOT_TRUE(1 == 2),
+	?ERLUNIT_NOT_TRUE(1),
+	?ERLUNIT_NOT_TRUE(0 > b),
+
+	?ERLUNIT_NOT_TRUE_MSG(1 == 2, "One is not Two"),
+	?ERLUNIT_NOT_TRUE_MSG(1, "One is not True"),
+	?ERLUNIT_NOT_TRUE_MSG(0 > b, "A Number Is Not Bigger Than an Atom"),
+
+	?ERLUNIT_FALSE(1 == 2),
+	?ERLUNIT_FALSE(false),
+	?ERLUNIT_FALSE(0 > b),
+
+	?ERLUNIT_FALSE_MSG(1 == 2, "One is not Two"),
+	?ERLUNIT_FALSE_MSG(not true, "Not true is false"),
+	?ERLUNIT_FALSE_MSG(0 > b, "A Number Is Not Bigger Than an Atom"),
+
+	?ERLUNIT_NOT_FALSE(1 == 1),
+	?ERLUNIT_NOT_FALSE(1),
+	?ERLUNIT_NOT_FALSE(0 < b),
+
+	?ERLUNIT_NOT_FALSE_MSG(1 == 1, "One is One"),
+	?ERLUNIT_NOT_FALSE_MSG(1, "One is not False"),
+	?ERLUNIT_NOT_FALSE_MSG(0 < b, "A Number Is Smaller Than an Atom"),
+
+%%% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
 	?ERLUNIT_FAIL(1 / zero()),
 	?ERLUNIT_FAIL(exit(sic)),
 	?ERLUNIT_FAIL(throw(sic)),
@@ -554,37 +571,210 @@ suite_first_macros() ->
 	?ERLUNIT_PASS_MSG(_A = a, "A Can Become a"),
 	?ERLUNIT_PASS_MSG(0 < b, "A Number Is Smaller Than an Atom"),
 
+	?ERLUNIT_EXITS(exit(sic)),
+	?ERLUNIT_EXITS_MSG(exit(sic), "Exit"),
+
+	?ERLUNIT_THROWS(throw(sic)),
+	?ERLUNIT_THROWS_MSG(throw(sic), "Throw"),
+
+	?ERLUNIT_ERROR(1 / zero()),
+	?ERLUNIT_ERROR_MSG(1 / zero(), "Error: One By Zero"),
+
+%%% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+	?ERLUNIT_EQUAL(true, true),
+	?ERLUNIT_EQUAL(1, 1.0),
+	?ERLUNIT_EQUAL(0, -0),
+	
+	?ERLUNIT_EQUAL_MSG(true, true, "True is True"),
+	?ERLUNIT_EQUAL_MSG(1, 1.0, "One (Integer) is One (Float)"),
+	?ERLUNIT_EQUAL_MSG(0, -0, "Zero is minus Zero"),
+	
+	?ERLUNIT_NOT_EQUAL(true, false),
+	?ERLUNIT_NOT_EQUAL(1, 2),
+	?ERLUNIT_NOT_EQUAL(true, 1),
+	
+	?ERLUNIT_NOT_EQUAL_MSG(true, false, "True is not equal False"),
+	?ERLUNIT_NOT_EQUAL_MSG(1, 2, "One is not equal Two"),
+	?ERLUNIT_NOT_EQUAL_MSG(true, 1, "True is not equal 1"),
+
+	?ERLUNIT_EXACT(true, true),
+	?ERLUNIT_EXACT(1, 1),
+	?ERLUNIT_EXACT(true, 1 == 1),
+	
+	?ERLUNIT_EXACT_MSG(true, true, "True exactly equals True"),
+	?ERLUNIT_EXACT_MSG(1, 1, "One exactly equals One"),
+	?ERLUNIT_EXACT_MSG(true, 1==1, "True exactly equals (1==1)"),
+
+	?ERLUNIT_BIGGER(2, 1),
+	?ERLUNIT_BIGGER(a, 0),
+	?ERLUNIT_BIGGER(true, false),
+	
+	?ERLUNIT_BIGGER_MSG(2, 1, "Two is bigger than One"),
+	?ERLUNIT_BIGGER_MSG(a, 0, "An Atom is bigger than Zero"),
+	?ERLUNIT_BIGGER_MSG(true, false, "True is bigger than false"),
+	
+	?ERLUNIT_LESSER(1, 2),
+	?ERLUNIT_LESSER(0, a),
+	?ERLUNIT_LESSER(1, 1.1),
+	
+	?ERLUNIT_LESSER_MSG(1, 2, "One is lesser than Two"),
+	?ERLUNIT_LESSER_MSG(0, a, "Zero is lesser than an Atom"),
+	?ERLUNIT_LESSER_MSG(1, 1.1, "One is lesser than One point One"),
+
 	ok.
 
 	% using zero() for 0 to avoid Erlang compile time warnings
 
 %%%
 %%%----------------------------------------------------------------------------
-%%% #9: first macros, inverted
+%%% #9: macros, inverted
 %%%----------------------------------------------------------------------------
 %%%
-%%% work in progress here.
 
-suite_first_macros_inverted() ->
+suite_macros_inverted() ->
 
-	erlunit:suite("#9 - first macros, inverted", [inverted]),
+	erlunit:suite("#9 - macros, inverted", [inverted]),
 
-	?ERLUNIT_EQUAL(true, false),
-	?ERLUNIT_EQUAL(1, 0),
-	?ERLUNIT_EQUAL(nil, 0),
 	
-	?ERLUNIT_EQUAL_MSG(true, false, "True is False"),
-	?ERLUNIT_EQUAL_MSG(1, 2, "One is Two"),
-	?ERLUNIT_EQUAL_MSG(0, nil, "Zero is Nil"),
-	
+	% inverted!
+	?ERLUNIT_TRUE(1 /= 1),
+	?ERLUNIT_TRUE(_A = false), % sic
+	?ERLUNIT_TRUE(0 > b),  % sic
+
+	% inverted!
+	?ERLUNIT_TRUE_MSG(1 /= 1, "One equals One"),
+	?ERLUNIT_TRUE_MSG(_A = false, "A is assigned false"),
+	?ERLUNIT_TRUE_MSG(0 > b,  "A Number Is Bigger Than an Atom"),
+
+	% inverted!
+	?ERLUNIT_NOT_TRUE(1 /= 2),
+	?ERLUNIT_NOT_TRUE(true),
+	?ERLUNIT_NOT_TRUE(0 < b),
+
+	% inverted!
+	?ERLUNIT_NOT_TRUE_MSG(1 == 1, "One is One"),
+	?ERLUNIT_NOT_TRUE_MSG(true, "True is not True"),
+	?ERLUNIT_NOT_TRUE_MSG(0 < b, "A Number Is Smaller Than an Atom"),
+
+	% inverted!
+	?ERLUNIT_FALSE(1 == 1),
+	?ERLUNIT_FALSE(true),
+	?ERLUNIT_FALSE(0 < b),
+
+	% inverted!
+	?ERLUNIT_FALSE_MSG(1 == 1, "One is One"),
+	?ERLUNIT_FALSE_MSG(not false, "Not false is false"),
+	?ERLUNIT_FALSE_MSG(0 < b, "A Number Is Smaller Than an Atom"),
+
+	% inverted!
+	?ERLUNIT_NOT_FALSE(1 == 2),
+	?ERLUNIT_NOT_FALSE(false),
+	?ERLUNIT_NOT_FALSE(0 > b),
+
+	% inverted!
+	?ERLUNIT_NOT_FALSE_MSG(1 == 2, "One is Two"),
+	?ERLUNIT_NOT_FALSE_MSG(false, "False is not False"),
+	?ERLUNIT_NOT_FALSE_MSG(0 > b, "A Number Is Bigger Than an Atom"),
+
+%%% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+	% inverted!
+	?ERLUNIT_FAIL(_A = a),
+	?ERLUNIT_FAIL_MSG(_A = a, "A = a"),
+
 	% expected to crash, which will in this inverted suite count as pass:
 	?ERLUNIT_PASS(1 / zero()),
 	?ERLUNIT_PASS(exit(sic)), 
 	?ERLUNIT_PASS(throw(sic)),
 
+	% inverted!
 	?ERLUNIT_PASS_MSG(1 / zero(), "One By Zero"),
 	?ERLUNIT_PASS_MSG(exit(sic), "Exit"),
 	?ERLUNIT_PASS_MSG(throw(sic), "Throw"),
+
+	% inverted!
+	?ERLUNIT_THROWS(exit(sic)),
+	?ERLUNIT_THROWS(_A = a),
+	?ERLUNIT_THROWS(1 / zero()),
+
+	% inverted!
+	?ERLUNIT_THROWS_MSG(exit(sic),  "Exit"),
+	?ERLUNIT_THROWS_MSG(_A = a, "A = a"),
+	?ERLUNIT_THROWS_MSG(1 / zero(), "Error (1/0)"),
+
+	% inverted!
+	?ERLUNIT_ERROR(exit(sic)),
+	?ERLUNIT_ERROR(throw(sic)),
+	?ERLUNIT_ERROR(_A = a),
+
+	% inverted!
+	?ERLUNIT_ERROR_MSG(exit(sic),  "Exit"),
+	?ERLUNIT_ERROR_MSG(throw(sic), "Throw"),
+	?ERLUNIT_ERROR_MSG(_A = a, "A = a"),
+
+	% inverted!
+	?ERLUNIT_EXITS(_A = a),
+	?ERLUNIT_EXITS(throw(sic)),
+	?ERLUNIT_EXITS(1 / zero()),
+
+	% inverted!
+	?ERLUNIT_EXITS_MSG(_A = a,  "A = a"),
+	?ERLUNIT_EXITS_MSG(throw(sic), "Throw"),
+	?ERLUNIT_EXITS_MSG(1 / zero(), "Error (1/0)"),
+
+
+%%% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+	% inverted!
+	?ERLUNIT_EQUAL(true, false),
+	?ERLUNIT_EQUAL(1, 2),
+	?ERLUNIT_EQUAL(a, b),
+	
+	% inverted!
+	?ERLUNIT_EQUAL_MSG(true, false, "True is False"),
+	?ERLUNIT_EQUAL_MSG(1, 2, "One is Two"),
+	?ERLUNIT_EQUAL_MSG(a, b, "a is b"),
+	
+	% inverted!
+	?ERLUNIT_NOT_EQUAL(true, true),
+	?ERLUNIT_NOT_EQUAL(1, 1),
+	?ERLUNIT_NOT_EQUAL(true, 1 == 1),
+	
+	% inverted!
+	?ERLUNIT_NOT_EQUAL_MSG(true, true, "True is not equal True"),
+	?ERLUNIT_NOT_EQUAL_MSG(1, 1, "One is not equal One"),
+	?ERLUNIT_NOT_EQUAL_MSG(true, 1 == 1, "True is equal (1 == 1)"),
+
+	% inverted!
+	?ERLUNIT_EXACT(true, false),
+	?ERLUNIT_EXACT(1, 1.0),
+	?ERLUNIT_EXACT(false, 1 == 1),
+	
+	% inverted!
+	?ERLUNIT_EXACT_MSG(true, false, "True exactly equals False"),
+	?ERLUNIT_EXACT_MSG(1, 1.0, "One (Integer) exactly equals One (Integer)"),
+	?ERLUNIT_EXACT_MSG(false, 1==1, "False exactly equals (1==1)"),
+
+	% inverted!
+	?ERLUNIT_BIGGER(1, 1),
+	?ERLUNIT_BIGGER(0, a),
+	?ERLUNIT_BIGGER(false, true),
+	
+	% inverted!
+	?ERLUNIT_BIGGER_MSG(1, 2, "One is bigger than Two"),
+	?ERLUNIT_BIGGER_MSG(0, a, "An Number is bigger than an Atom"),
+	?ERLUNIT_BIGGER_MSG(falser, truer, "Falser is bigger than Truer"),
+	
+	% inverted!
+	?ERLUNIT_LESSER(2, 1),
+	?ERLUNIT_LESSER(a, 0),
+	?ERLUNIT_LESSER(1.1, 1),
+	
+	% inverted!
+	?ERLUNIT_LESSER_MSG(2, 1, "Two is lesser than One"),
+	?ERLUNIT_LESSER_MSG(a, 0, "a is lesser than 0"),
+	?ERLUNIT_LESSER_MSG(1.1, 1, "One point one is lesser than One"),
 
 	ok.
 

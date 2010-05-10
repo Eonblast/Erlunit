@@ -1,5 +1,15 @@
-Erlunit 0.2.5/alpha - CHANGES
+Erlunit 0.2.6/alpha - CHANGES
 
+0.2.6   10 May 2010 - Macros Complete -
+
+		+ added remaining macros and their function variations for:
+		  true, not_true, false, not_false, not_equal, bigger, lesser,
+          throws, exits, error.
+        + hardened against crashing suites in main receiver loop
+        + added test-tests for all macros
+        + fixed colors for message passing style
+                
+		
 0.2.5   03 May 2010 - Exact Equality -
 
         + added exact comparison of numbers (1 =/= 1.0)

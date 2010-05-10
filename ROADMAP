@@ -1,4 +1,4 @@
-Erlunit 0.2.5/alpha - ROADMAP
+Erlunit 0.2.6/alpha - ROADMAP
 
 
 Mail hd2010@eonblast.com with requests. No promisses:
@@ -18,8 +18,12 @@ Mail hd2010@eonblast.com with requests. No promisses:
     
     - percentile
 
-0.5 - make sense of suite concurrency
+    - more docs for macros 
+    
+    - more samples for macros
 
+0.5 - make sense of suite concurrency
+   
 0.6 - asynchronous server tests
 
     - internal: possibly refactor suite_lop, remove counter
