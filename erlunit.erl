@@ -1,7 +1,7 @@
 %%%----------------------------------------------------------------------------
 %%% File        : erlunit.erl
 %%% Description : Test functions
-%%% Version     : 0.2.7/alpha
+%%% Version     : 0.2.7.1/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - see below 
@@ -29,6 +29,7 @@
 %%%
 %%% There are Erlang masters on erlang-questions, this here source is
 %%% not written by one. Beware of copying mistakes if you are learning.
+%%% There may be a slight advantage to that, the code is kind of plain.
 %%%
 %%% Mail to hd2010@eonblast.com with questions and suggestions, I will
 %%% be quite happy to answer. - Henning
@@ -63,7 +64,7 @@
 %%%----------------------------------------------------------------------------
 
 -module(erlunit).
--vsn("0.2.7/alpha").
+-vsn("0.2.7.1/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -91,9 +92,12 @@
 
 -export([glist/1, glist_add/3, glist_get/2, glist_get/3, glist_drop/2, glist_loop/0, glist_loop/3]).
 
+-compile([{nowarn_unused_function, [passed/3, failed/3]}]).
+
+
 %%%----------------------------------------------------------------------------
 
--define(VERSION, "0.2.7/alpha").
+-define(VERSION, "0.2.7.1/alpha").
 -define(LIBRARY, "Erlunit").
 -define(COPYRIGHT, "(c) 2010 Eonblast Corporation http://www.eonblast.com").
 
@@ -101,7 +105,8 @@
 -define(PROMPT, "erlunit: ").
 -define(INDENT, "         ").
 
--define(USERR, "This is an error in the way you use erlunit, or an error in erlunit itself.").
+-define(USRERR, "This is an error in the way you use erlunit, or an error in erlunit itself.").
+-define(PRGERR, "This is an error in erlunit itself.").
 -define(INVERT, "This is an inverted suite. Fails count for Passes, for testing the tests.").
 
 -define(DEFAULT_SUITE_NAME, "Default Suite").
@@ -540,10 +545,12 @@ passed(Suite, Message, Result) -> passed(Suite, Message, Result, []).
 
 passed(Suite, Message, Result, ResultParameter) ->
 
+	try
 		Suite ! passed,
 
 	  	Options = get(options),
 
+		% this works for both main process or suite processes
 	  	case lists:member(nopasses,Options) of
 	  		true -> nil;
 	  		false ->
@@ -554,8 +561,11 @@ passed(Suite, Message, Result, ResultParameter) ->
 					[SuiteName, iff(SuiteName,": ",""), 
 					"", % iff(length(SuiteName) > ((width()-15)*2), <<13,10,?INDENT,"     ` ">>,""),
 					 Message | ResultParameter])
-		end.
-
+		end
+	catch
+		Type:Reason -> io:format("~n~n~nCrashed while printing success message. "
+		                         ++ ?PRGERR ++"~n ~p~p~n~n~n", [Type, Reason])
+	end.
 
 %%%----------------------------------------------------------------------------
 %%% failed - echo negative result and count it
@@ -566,8 +576,10 @@ failed(Suite, Message, Result) -> failed(Suite, Message, Result, []).
 
 failed(Suite, Message, Result, ResultParameter) ->
 
+	try
 		Suite ! failed,
 
+		% this works for both main process or suite processes
 	  	Options = get(options),
 
 	  	case lists:member(nofails,Options) of
@@ -582,9 +594,11 @@ failed(Suite, Message, Result, ResultParameter) ->
 				SuiteName = glist_get(suitenames, Suite, ""),
 				io:format(?PROMPT ++ "FAIL | ##### ~s~s ~s~s~s | " ++ Result ++ ". #####~n",
 					[SuiteName, iff(SuiteName,":",""), Red, Message, UnRed | ResultParameter])
-		end.
-
-
+		end
+	catch
+		Type:Reason -> io:format("~n~n~nCrashed while printing failure message. " 
+		                         ++ ?PRGERR ++"~n ~p~p~n~n~n", [Type, Reason])
+	end.
 
 %%%----------------------------------------------------------------------------
 %%% crashed - echo negative result and count it
@@ -676,7 +690,7 @@ execute_loop(Phase, SuitesActive, SuitesToPrint) ->
 
 				% protection vs misuse
 				true ->
-					exit("Too late to add ~s. " ++ ?USERR ++ " Try D3.", [Name])
+					exit("Too late to add ~s. " ++ ?USRERR ++ " Try D3.", [Name])
 			end;
 
 		{ done, Suite } -> 
@@ -735,7 +749,7 @@ execute_loop(Phase, SuitesActive, SuitesToPrint) ->
 		end
 
 		after 3000 ->
-			exit("Main process stalled. " ++ ?USERR ++ " Try 3D.")
+			exit("Main process stalled. " ++ ?USRERR ++ " Try 3D.")
 	end.
 
 
@@ -1006,12 +1020,12 @@ suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed) ->
 				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed);
 				
 			Malformed -> 
-				echo("###### ~s can't deal with ~w. ######~n###### ~s ######", [Nom, Malformed, ?USERR]),
+				echo("###### ~s can't deal with ~w. ######~n###### ~s ######", [Nom, Malformed, ?USRERR]),
 				self() ! crashed,
 				suite_loop(Nom, Flags, Caller, Sub, Passed, Failed, Crashed)
 				
 			after 1000 ->
-				exit("Suite " ++ Nom ++ " stalled. " ++ ?USERR)
+				exit("Suite " ++ Nom ++ " stalled. " ++ ?USRERR)
 		end
 
     catch
@@ -1144,7 +1158,7 @@ glist_add(GList, Key, Contents) ->
 	vecho(?D4, "glist_add: GList ~w | Key ~w | Contents ~w", [GList, Key, Contents]),
 
 	GList ! { add, { Key, Contents }, self() },
-	receive ok -> ok after 3000 -> exit("Urgh. Programmed to death. glist_add() stalled. " ++ ?USERR ++ " Try D4.") end.
+	receive ok -> ok after 3000 -> exit("Urgh. Programmed to death. glist_add() stalled. " ++ ?USRERR ++ " Try D4.") end.
 	% this is forced sequentiality
 
 %%%
@@ -1156,7 +1170,7 @@ glist_add(GList, Key, Contents) ->
 glist_drop(GList, Key) ->
 	
 	GList ! { drop, Key, self() },
-	receive ok -> ok after 3000 -> exit("Urgh. Programmed to death. glist_drop() stalled. " ++ ?USERR ++ " Try D4.") end.
+	receive ok -> ok after 3000 -> exit("Urgh. Programmed to death. glist_drop() stalled. " ++ ?USRERR ++ " Try D4.") end.
 	% this is forced sequentiality
 
 %%%
@@ -1196,7 +1210,7 @@ glist_get(GList, Key, Default, Retry) ->
 						_ ->
 							Default 
 					end
-				after 3000 -> exit("Urgh. Programmed to death. glist_get() stalled. " ++ ?USERR ++ " Try D4.") 
+				after 3000 -> exit("Urgh. Programmed to death. glist_get() stalled. " ++ ?USRERR ++ " Try D4.") 
 			end;
 			% immediate receive forces sequentiality
 		
@@ -1222,7 +1236,7 @@ payload(Suite, Message, Fun) when is_function(Fun) ->
     	Fun()
 	catch
     	throw:Term -> 
-    		failed(Suite, Message, "throws exception (~w) but should pass ok, [Term]"),
+    		failed(Suite, Message, "throws exception (~w) but should pass ok", [Term]),
     		throw(Term);
     	exit:Reason -> 
     		failed(Suite, Message, "makes exit (~w) but should pass ok", [Reason]),

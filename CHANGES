@@ -1,8 +1,14 @@
-Erlunit 0.2.7/alpha - CHANGES
+Erlunit 0.2.7.1/alpha - CHANGES
+
+0.2.7.1 10 May 2010 - Internal Fix
+
+		+ fixed malfunction of failure message of payload
+
 
 0.2.7   10 May 2010 - Macro Doc
 
 		+ added documentation on macros in manual
+
 
 0.2.6   09 May 2010 - Macros Complete, Hardened Suites - 89b78962d84257f3997e
 
