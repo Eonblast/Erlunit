@@ -1,11 +1,23 @@
-Erlunit 0.2.7.1/alpha - CHANGES
+Erlunit 0.2.8/alpha - CHANGES
 
-0.2.7.1 10 May 2010 - Internal Fix
+Find the current version of this file at http://github.com/Eonblast/Erlunit/blob/master/CHANGES
+
+
+0.2.8	14 May 2010 - Tracing - 
+
+		+ added stacktraces for crashing tests
+		+ added delimiter for overly long data dumps
+		+ added verbose disclaimer to inverted fails
+		+ made strong_banner() simply banner()
+		
+
+0.2.7.1 10 May 2010 - Internal Fix - 
 
 		+ fixed malfunction of failure message of payload
+		+ hardened pass and failure message functions against crash
 
 
-0.2.7   10 May 2010 - Macro Doc
+0.2.7   10 May 2010 - Macro Doc - 
 
 		+ added documentation on macros in manual
 
@@ -67,4 +79,4 @@ Erlunit 0.2.7.1/alpha - CHANGES
 0.1.2   22 Apr 2010 - Fixes and Cosmetics - 3e89ba4db3d26839adaec5e72a3e4e948b95c9de
 
 
-0.1     22 Apr 2010 - First Public Release to Github - f1e46c2442341a89ecf153ac46ef9932a46c1583
+0.1     22 Apr 2010 - First Public Release - f1e46c2442341a89ecf153ac46ef9932a46c1583

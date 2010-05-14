@@ -1,4 +1,4 @@
-Erlunit 0.2.7.1/alpha - MANUAL
+Erlunit 0.2.8/alpha - MANUAL
 
 ----------------------------------------------------------------------------o--
 ---ooo-ooo--o--o--o-o--o-o-ooo----------------------------------------------o--
@@ -775,7 +775,7 @@ THE SOFTWARE.
  File        : MANUAL
  Description : Description of Erlunit
  Type        : Documentation
- Version     : 0.2.7.1/alpha
+ Version     : 0.2.8/alpha
  Status      : alpha
  Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
  License     : MIT - see above 

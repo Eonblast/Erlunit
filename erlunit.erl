@@ -1,7 +1,7 @@
 %%%----------------------------------------------------------------------------
 %%% File        : erlunit.erl
 %%% Description : Test functions
-%%% Version     : 0.2.7.1/alpha
+%%% Version     : 0.2.8/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - see below 
@@ -64,7 +64,7 @@
 %%%----------------------------------------------------------------------------
 
 -module(erlunit).
--vsn("0.2.7.1/alpha").
+-vsn("0.2.8/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -86,9 +86,10 @@
 -export([exact/5, equal/5, not_equal/5, bigger/5, lesser/5]).
 
 -export([echo/1, echo/2]).
--export([banner/0, banner/1, strong_banner/1, strong_banner/2, center/2]).
+-export([banner/1, banner/2, ascii_banner/0, ascii_banner/1, center/2]).
+-export([strong_banner/1, strong_banner/2]). % legacy
 -export([vecho/2, vecho/3]).
--export([alive/1]).
+-export([alive/1,delimited/1]).
 
 -export([glist/1, glist_add/3, glist_get/2, glist_get/3, glist_drop/2, glist_loop/0, glist_loop/3]).
 
@@ -97,7 +98,7 @@
 
 %%%----------------------------------------------------------------------------
 
--define(VERSION, "0.2.7.1/alpha").
+-define(VERSION, "0.2.8/alpha").
 -define(LIBRARY, "Erlunit").
 -define(COPYRIGHT, "(c) 2010 Eonblast Corporation http://www.eonblast.com").
 
@@ -259,11 +260,11 @@ pass(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
     	passed(Suite, Message, "passes ok")
 	catch
     	throw:Term -> 
-    		failed(Suite, Message, "throws exception (~w) but should pass ok | ~w  ~w", [Term, Module, Line]);
+    		failed(Suite, Message, "throws exception (~w) but should pass ok | ~w  ~w~n~p", [Term, Module, Line, erlang:get_stacktrace()]);
     	exit:Reason -> 
-    		failed(Suite, Message, "make exit (~w) but should pass ok | ~w  ~w", [Reason, Module, Line]);
+    		failed(Suite, Message, "make exit (~w) but should pass ok | ~w  ~w~n~p", [Reason, Module, Line, erlang:get_stacktrace()]);
     	error:Reason -> 
-    		failed(Suite, Message, "runs into error (~w) but should pass ok | ~w  ~w", [Reason, Module, Line])
+    		failed(Suite, Message, "runs into error (~w) but should pass ok | ~w ~w~n~p", [Reason, Module, Line, erlang:get_stacktrace()])
 	end.
 
 %%%                                                                      checks
@@ -286,7 +287,7 @@ fail(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
 
     try 
     	Result = Fun(),
-    	failed(Suite, Message, "passes ok (~w) but should fail | ~w  ~w", [Result, Module, Line])
+    	failed(Suite, Message, "passes ok (~w) but should fail | ~w  ~w~n~p", [Result, Module, Line, erlang:get_stacktrace()])
 	catch
     	throw:Term -> 
     		passed(Suite, Message, "throws exception (~w), failing as it should", [Term]);
@@ -317,14 +318,14 @@ throws(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
 
     try 
     	Fun(),
-    	failed(Suite, Message, "passes ok but should throw and fail | ~w ~w", [Module, Line])
+    	failed(Suite, Message, "passes ok but should throw and fail | ~w ~w~n~p", [Module, Line, erlang:get_stacktrace()])
 	catch
     	throw:_Term -> 
     		passed(Suite, Message, "throws exception, as it should");
     	exit:_Reason -> 
-    		failed(Suite, Message, "makes exit, but should throw and and fail | ~w ~w", [Module,Line]);
+    		failed(Suite, Message, "makes exit, but should throw and and fail | ~w ~w~n~p", [Module,Line, erlang:get_stacktrace()]);
     	error:_Reason -> 
-    		failed(Suite, Message, "runs into error, but should throw and fail | ~w ~w", [Module,Line])
+    		failed(Suite, Message, "runs into error, but should throw and fail | ~w ~w~n~p", [Module,Line, erlang:get_stacktrace()])
 	end.
 %%%                                                                      checks
 %%%----------------------------------------------------------------------------
@@ -346,14 +347,14 @@ exits(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
 
     try 
     	Fun(),
-    	failed(Suite, Message, "passes ok but should throw and fail | ~w ~w", [Module,Line])
+    	failed(Suite, Message, "passes ok but should throw and fail | ~w ~w~n~p", [Module,Line, erlang:get_stacktrace()])
 	catch
     	throw:_Term -> 
-    		failed(Suite, Message, "throws exception, as it should | ~w ~w", [Module,Line]);
+    		failed(Suite, Message, "throws exception, as it should | ~w ~w~n~p", [Module,Line, erlang:get_stacktrace()]);
     	exit:_Reason -> 
     		passed(Suite, Message, "makes exit, but should throw and and fail");
     	error:_Reason -> 
-    		failed(Suite, Message, "runs into error, but should throw and fail | ~w ~w", [Module,Line])
+    		failed(Suite, Message, "runs into error, but should throw and fail | ~w ~w~n~p", [Module,Line, erlang:get_stacktrace()])
 	end.
 %%%                                                                      checks
 %%%----------------------------------------------------------------------------
@@ -375,12 +376,12 @@ error(Suite, Fun, Message, Module, Line) when is_function(Fun) ->
 
     try 
     	Fun(),
-    	failed(Suite, Message, "passes ok but should run into error | ~w ~w", [Module, Line])
+    	failed(Suite, Message, "passes ok but should run into error | ~w ~w~n~p", [Module, Line, erlang:get_stacktrace()])
 	catch
     	throw:_Term -> 
-    		failed(Suite, Message, "throws exception, but should run into error | ~w ~w", [Module,Line]);
+    		failed(Suite, Message, "throws exception, but should run into error | ~w ~w~n~p", [Module,Line, erlang:get_stacktrace()]);
     	exit:_Reason -> 
-    		failed(Suite, Message, "makes exit, but should run into error | ~w ~w", [Module,Line]);
+    		failed(Suite, Message, "makes exit, but should run into error | ~w ~w~n~p", [Module,Line, erlang:get_stacktrace()]);
     	error:_Reason -> 
     		passed(Suite, Message, "runs into error, as it should")
 	end.
@@ -582,6 +583,12 @@ failed(Suite, Message, Result, ResultParameter) ->
 		% this works for both main process or suite processes
 	  	Options = get(options),
 
+		FailTag = 
+	  	case lists:member(inverted,get(flags)) of
+			true -> "FAIL (but inverted for testing the tests = ok)";
+			false -> "FAIL"
+		end,
+
 	  	case lists:member(nofails,Options) of
 	  		true -> nil;
 	  		false ->
@@ -592,8 +599,8 @@ failed(Suite, Message, Result, ResultParameter) ->
 	  			end,
 
 				SuiteName = glist_get(suitenames, Suite, ""),
-				io:format(?PROMPT ++ "FAIL | ##### ~s~s ~s~s~s | " ++ Result ++ ". #####~n",
-					[SuiteName, iff(SuiteName,":",""), Red, Message, UnRed | ResultParameter])
+				io:format(?PROMPT ++ "~s | ##### ~s~s ~s~s~s | " ++ delimited(Result) ++ ". #####~n",
+					[FailTag, SuiteName, iff(SuiteName,":",""), Red, delimited(Message), UnRed | delimited(ResultParameter)])
 		end
 	catch
 		Type:Reason -> io:format("~n~n~nCrashed while printing failure message. " 
@@ -626,7 +633,39 @@ crashed(Suite, Reason) ->
 				io:format(?PROMPT ++ "CRASH | XXXXX ~s~s ~s~w ~w~s XXXXX~n",
 					[SuiteName, iff(SuiteName,":",""), Red, Reason, erlang:get_stacktrace(), UnRed]).
 %		end.
-		
+
+%%%----------------------------------------------------------------------------
+%%% kinda cut messages short, whatever gives
+%%%----------------------------------------------------------------------------		
+
+-define(DELIMIT, 100).
+
+delimited([]) ->
+
+	[];	
+
+delimited(List) when is_list(List), length(List) > ?DELIMIT ->
+
+	delimited(lists:append(lists:sublist(List, ?DELIMIT),"....."));
+
+delimited(List) when is_list(List) ->
+
+	[ delimited(X) || X <- List ];
+
+delimited(Tuple) when is_tuple(Tuple) ->
+
+	list_to_tuple([ delimited(X) || X <- tuple_to_list(Tuple) ]);
+
+delimited(Item) when is_binary(Item), size(Item) > ?DELIMIT ->
+
+	<<Limited:?DELIMIT/binary, _/binary>> = Item,
+	<<Limited/binary, ".....">>;
+
+delimited(Item) ->
+
+	Item.
+
+
 %%%****************************************************************************
 %%% MAIN TEST
 %%%****************************************************************************
@@ -642,7 +681,7 @@ start() -> start([]).
 
 start(Options) when is_list(Options) ->
 
-	banner(),
+	ascii_banner(),
 
 	echo("Start of Tests."),
 	register(main, self()),
@@ -752,6 +791,7 @@ execute_loop(Phase, SuitesActive, SuitesToPrint) ->
 			exit("Main process stalled. " ++ ?USRERR ++ " Try 3D.")
 	end.
 
+	% TODO: return a value from stats: ok, fail or error.
 
 %%%****************************************************************************
 %%% SUITE
@@ -767,6 +807,8 @@ suite(Nom) -> suite(Nom, []).
 suite(Nom, Flags) when is_list(Nom), is_list(Flags) -> 
 
 	vecho(?V1, "~s~nStarting Suite ~s.", [line(), Nom]),
+	
+	put(flags, Flags),
 	
 	case lists:member(inverted, Flags) of
 		true ->	strong_banner(Nom ++ ": " ++ ?INVERT, 0);
@@ -1236,13 +1278,16 @@ payload(Suite, Message, Fun) when is_function(Fun) ->
     	Fun()
 	catch
     	throw:Term -> 
-    		failed(Suite, Message, "throws exception (~w) but should pass ok", [Term]),
+    		failed(Suite, Message, "throws exception (~w) but should pass ok.~n~p", [Term, erlang:get_stacktrace()]),
     		throw(Term);
     	exit:Reason -> 
-    		failed(Suite, Message, "makes exit (~w) but should pass ok", [Reason]),
+    		failed(Suite, Message, "makes exit (~w) but should pass ok.~n~p", [Reason, erlang:get_stacktrace()]),
     		throw(Reason);
+    	error:{ badarity, _ } -> 
+    		failed(Suite, Message, "runs into error (~w) but should pass ok. Maybe you did not want ~p to be executed to evaluate the test? If you want to compare function references, you need to convert them, e.g to strings. Function references will otherwise be executed with arity 0, for your convenience (sic). Note that you might have other irregularities that are not detected, where the function is of arity 0. This here error was only detected because ~p is not of arity 0.", [badarity, Fun, Fun, erlang:get_stacktrace()]),
+    		throw(badarity);
     	error:Reason -> 
-    		failed(Suite, Message, "runs into error (~w) but should pass ok", [Reason]),
+    		failed(Suite, Message, "runs into error (~w) but should pass ok.~n~p", [Reason, erlang:get_stacktrace()]),
     		throw(Reason)
 	end;
 
@@ -1378,9 +1423,9 @@ line(Type) ->
 %%% when scrolling up and down the terminal window. And I like it, too.
 %%%
 
-banner() -> banner("").
+ascii_banner() -> ascii_banner("").
 
-banner(Message) ->
+ascii_banner(Message) ->
     io:format("------------------------------------------------------------------------o--~n"),
     io:format("---ooo-ooo--o--o--o-o--o-o-ooo------------------------------------------o--~n"),
     io:format("---Oo--OoO--O--O--O-Oo-O-O--O-------------------------------------------o--~n"),
@@ -1394,6 +1439,10 @@ banner(Message) ->
 %%% Strong Banner
 %%%----------------------------------------------------------------------------
 %%% Centered banner with text only:
+
+% translate legacy name
+banner(Text) -> strong_banner(Text).
+banner(Text, EmptyRows) -> strong_banner(Text, EmptyRows).
 
 strong_banner(Text) -> strong_banner(Text, 1).
 strong_banner(Text, EmptyRows) ->
