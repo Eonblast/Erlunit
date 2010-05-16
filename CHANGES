@@ -1,7 +1,12 @@
-Erlunit 0.2.8/alpha - CHANGES
+Erlunit 0.2.8.1/alpha - CHANGES
 
 Find the current version of this file at http://github.com/Eonblast/Erlunit/blob/master/CHANGES
 
+
+0.2.8.1 15 May 2010 - Fix -
+
+		+ fixed deadloop of delimited() on long error messages
+		 
 
 0.2.8	14 May 2010 - Tracing - 
 

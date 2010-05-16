@@ -1,7 +1,7 @@
 %%%----------------------------------------------------------------------------
 %%% File        : sample.erl
 %%% Description : Sample usage of test functions in erlunit.erl
-%%% Version     : 0.2.8/alpha
+%%% Version     : 0.2.8.1/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - http://www.opensource.org/licenses/mit-license.php 
@@ -66,7 +66,7 @@
 
 -module(sample).
 
--vsn("0.2.8/alpha").
+-vsn("0.2.8.1/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -81,7 +81,7 @@
 
 -compile({nowarn_unused_function, [banner/1]}).
 
--define(VERSION, "0.2.8/alpha").
+-define(VERSION, "0.2.8.1/alpha").
 -define(PROGRAM, "Test Samples").
 
 %%%****************************************************************************
@@ -97,7 +97,7 @@ sample1() ->
 	erlunit:execute().
 
 
-	% --- That's it. A complete test program. Run with 
+	% --- That's it. A complete test program. It checks if 1 equals 1. Run with 
 	% --- # erl
 	% --- 1> c(erlunit), c(sample), sample:sample1().
 
@@ -183,6 +183,10 @@ sample3() ->
 	% --- That's it. Another complete test program. Run with 
 	% --- # erl
 	% --- 1> c(erlunit), c(sample), sample:sample3().
+	
+	% --- TRY THIS: Add a third suite by copy-pasting the two forelast lines.
+	% ---           Add more checks to suite #2 by copy-pasting the forelast.
+
 
 
 %%%****************************************************************************

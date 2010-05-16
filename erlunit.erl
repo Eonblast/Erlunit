@@ -1,13 +1,13 @@
 %%%----------------------------------------------------------------------------
 %%% File        : erlunit.erl
-%%% Description : Test functions
-%%% Version     : 0.2.8/alpha
+%%% Description : Test functions - import this file and use its functions.
+%%% Version     : 0.2.8.1/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - see below 
 %%% Author      : H. Diedrich <hd2010@eonblast.com>
 %%% Created     : 18 Apr 2010
-%%% Changed     : 10 May 2010 - see CHANGES
+%%% Changed     : 15 May 2010 - see CHANGES
 %%% Tested on   : Erlang R13B01
 %%%----------------------------------------------------------------------------
 %%%
@@ -64,7 +64,7 @@
 %%%----------------------------------------------------------------------------
 
 -module(erlunit).
--vsn("0.2.8/alpha").
+-vsn("0.2.8.1/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -98,7 +98,7 @@
 
 %%%----------------------------------------------------------------------------
 
--define(VERSION, "0.2.8/alpha").
+-define(VERSION, "0.2.8.1/alpha").
 -define(LIBRARY, "Erlunit").
 -define(COPYRIGHT, "(c) 2010 Eonblast Corporation http://www.eonblast.com").
 
@@ -561,7 +561,7 @@ passed(Suite, Message, Result, ResultParameter) ->
 				io:format(?PROMPT ++ "+ ok | ~s~s~s~s~n" ++ ?PROMPT ++ "     | --> " ++ Result ++ ".~n",
 					[SuiteName, iff(SuiteName,": ",""), 
 					"", % iff(length(SuiteName) > ((width()-15)*2), <<13,10,?INDENT,"     ` ">>,""),
-					 Message | ResultParameter])
+					 delimited(Message) | delimited(ResultParameter)])
 		end
 	catch
 		Type:Reason -> io:format("~n~n~nCrashed while printing success message. "
@@ -639,6 +639,7 @@ crashed(Suite, Reason) ->
 %%%----------------------------------------------------------------------------		
 
 -define(DELIMIT, 100).
+-define(DELIMIT_REPLACE, "....").
 
 delimited([]) ->
 
@@ -646,7 +647,7 @@ delimited([]) ->
 
 delimited(List) when is_list(List), length(List) > ?DELIMIT ->
 
-	delimited(lists:append(lists:sublist(List, ?DELIMIT),"....."));
+	delimited(lists:append(lists:sublist(List, ?DELIMIT - length(?DELIMIT_REPLACE)), ?DELIMIT_REPLACE));
 
 delimited(List) when is_list(List) ->
 
@@ -659,7 +660,7 @@ delimited(Tuple) when is_tuple(Tuple) ->
 delimited(Item) when is_binary(Item), size(Item) > ?DELIMIT ->
 
 	<<Limited:?DELIMIT/binary, _/binary>> = Item,
-	<<Limited/binary, ".....">>;
+	<<Limited/utf8, ".....">>;
 
 delimited(Item) ->
 

@@ -1,7 +1,7 @@
 %%%-------------------------------------------------------------------------%%%
 %%% File        : erlunit.hrl                                               %%% 
 %%% Description : Unit test convenience macros                              %%%      
-%%% Version     : 0.2.8/alpha                                             %%%
+%%% Version     : 0.2.8.1/alpha                                             %%%
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com     %%%
 %%% License     : MIT - see LICENSE                                         %%%
 %%% Author      : H. Diedrich <hd2010@eonblast.com>                         %%%
