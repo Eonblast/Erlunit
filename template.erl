@@ -1,7 +1,7 @@
 %%%----------------------------------------------------------------------------
 %%% File        : template.erl
 %%% Description : Template of mininal test functions using erlunit.erl
-%%% Version     : 0.2.8.1/alpha
+%%% Version     : 0.2.8.2/alpha
 %%% Status      : alpha
 %%% Copyright   : Public Domain
 %%% License     : MIT - http://www.opensource.org/licenses/mit-license.php 

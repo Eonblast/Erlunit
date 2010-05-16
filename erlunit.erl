@@ -1,7 +1,7 @@
 %%%----------------------------------------------------------------------------
 %%% File        : erlunit.erl
 %%% Description : Test functions - import this file and use its functions.
-%%% Version     : 0.2.8.1/alpha
+%%% Version     : 0.2.8.2/alpha
 %%% Status      : alpha
 %%% Copyright   : (c) 2010 Eonblast Corporation http://www.eonblast.com
 %%% License     : MIT - see below 
@@ -64,7 +64,7 @@
 %%%----------------------------------------------------------------------------
 
 -module(erlunit).
--vsn("0.2.8.1/alpha").
+-vsn("0.2.8.2/alpha").
 -author("H. Diedrich <hd2010@eonblast.com>").
 -license("MIT - http://www.opensource.org/licenses/mit-license.php").
 -copyright("(c) 2010 Eonblast Corporation http://www.eonblast.com").
@@ -98,7 +98,7 @@
 
 %%%----------------------------------------------------------------------------
 
--define(VERSION, "0.2.8.1/alpha").
+-define(VERSION, "0.2.8.2/alpha").
 -define(LIBRARY, "Erlunit").
 -define(COPYRIGHT, "(c) 2010 Eonblast Corporation http://www.eonblast.com").
 
@@ -565,7 +565,7 @@ passed(Suite, Message, Result, ResultParameter) ->
 		end
 	catch
 		Type:Reason -> io:format("~n~n~nCrashed while printing success message. "
-		                         ++ ?PRGERR ++"~n ~p~p~n~n~n", [Type, Reason])
+		                         ++ ?PRGERR ++"~n ~p ~p~n~n ~p ~n~n", [Type, Reason, erlang:get_stacktrace()])
 	end.
 
 %%%----------------------------------------------------------------------------
@@ -604,7 +604,7 @@ failed(Suite, Message, Result, ResultParameter) ->
 		end
 	catch
 		Type:Reason -> io:format("~n~n~nCrashed while printing failure message. " 
-		                         ++ ?PRGERR ++"~n ~p~p~n~n~n", [Type, Reason])
+		                         ++ ?PRGERR ++"~n ~p ~p~n~n~p~n~n", [Type, Reason, erlang:get_stacktrace()])
 	end.
 
 %%%----------------------------------------------------------------------------
@@ -660,7 +660,7 @@ delimited(Tuple) when is_tuple(Tuple) ->
 delimited(Item) when is_binary(Item), size(Item) > ?DELIMIT ->
 
 	<<Limited:?DELIMIT/binary, _/binary>> = Item,
-	<<Limited/utf8, ".....">>;
+	<<Limited/binary, ".....">>;
 
 delimited(Item) ->
 
